@@ -15,9 +15,14 @@
       user's mobile device or desktop. See https://developers.google.com/web/fundamentals/web-app-manifest/
     -->
     <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="http://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
     <!--
       Notice the use of %PUBLIC_URL% in the tags above.
       It will be replaced with the URL of the `public` folder during the build.
@@ -28,8 +33,9 @@
       Learn how to configure a non-root public URL by running `npm run build`.
     -->
     <title>React App</title>
+    
   </head>
-  <body>
+  <body class="main_app_body">
     <noscript>You need to enable JavaScript to run this app.</noscript>
     <div id="root"></div>
     <!--
@@ -42,5 +48,64 @@
       To begin the development, run `npm start` or `yarn start`.
       To create a production bundle, use `npm run build` or `yarn build`.
     -->
+
+    
+
+
+    
+
+    
+    <script>
+     (function($, window){
+  $(function() {
+    let arrowWidth = 25;
+
+    $.fn.selector = function(settings) {  
+      return this.each(function() { 
+
+        $(this).change(function(){
+          let $this = $(this);
+
+          // get font-weight, font-size, and font-family
+          let style = window.getComputedStyle(this)
+          let { fontWeight, fontSize, fontFamily } = style
+
+          // create test element
+          let text = $this.find("option:selected").text();
+          let $test = $("<span>").html(text).css({
+            "font-size": fontSize, 
+            "font-weight": fontWeight, 
+            "font-family": fontFamily,
+            "visibility": "hidden" // prevents FOUC
+          });
+
+          // add to body, get width, and get out
+          $test.appendTo($this.parent());
+          let width = $test.width();
+          $test.remove();
+
+          // set select width
+          $this.width(width + arrowWidth);
+
+          // run on start
+        }).change();
+
+      });
+    };
+
+    // run by default'
+    $("select.goog-te-combo").selector();
+    $("select.header_category_selector").selector();
+
+  })
+})(jQuery, window);
+    </script>
+
+<!-- <script>
+  function googleTranslateElementInit() {
+    new google.translate.TranslateElement("google_translate_element");
+  }
+</script> -->
+     
   </body>
 </html>

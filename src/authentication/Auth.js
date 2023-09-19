@@ -79,7 +79,7 @@ const Auth = () => {
 
                 </div>
               </div>
-              <p className='auth_buying_for_work'><b>Buying for work?</b><Link>create a free business account </Link></p>
+              <p className='auth_buying_for_work'><b>Buying for work?</b><Link to='/become-a-seller'>create a free business account </Link></p>
               <div className='auth_divider'>
                 <div className='auth_divider_inner'>
 

@@ -187,7 +187,7 @@ const ProductReducer = (state, action) => {
       case 'LOGIN_USER':
         return {...state , currentUser : action.payload }
       case 'LOGOUT_USER':
-        return {...state , currentUser : action.payload }
+        return {...state , currentUser : action.payload , user : {...state.user , role : ''}}
       case 'GOOGLE_SIGN_UP':
         return{...state , currentUser : action.payload}
       case 'CREATE_USER' : 
@@ -228,6 +228,8 @@ const ProductReducer = (state, action) => {
       case 'WRONG_PASSWORD': 
         return{...state , loginError : action.payload ,loginLoading : false }
       case 'INVALID_EMAIL':
+        return{...state , loginError : action.payload , loginLoading : false}
+      case 'LOGIN_USER_IS_DELETED' : 
         return{...state , loginError : action.payload , loginLoading : false}
       case 'LOGIN_EMAIL_EMPTY': 
         return{...state , loginInputError : {...state.loginInputError , email : true } }
@@ -344,11 +346,86 @@ const ProductReducer = (state, action) => {
         return{...state,  vendorError : {...state.vendorError , business: action.payload }}
       case 'VENDOR_NETWORK_REQUEST_FAILED':
         return{...state,  vendorError : {...state.vendorError , business: action.payload } }
-      
-
-      
-
-
+      case 'GET_USER_LOACTION_HEADER':
+        return{...state , location : {...state.location , country : action.payload.country , city :action.payload.city }}
+      case 'SHOW_SIGN_IN_DROPDOWN':
+          return{...state, signInDropdown: true  }
+      case 'MAKE_SIGNUP_DROPDOWN_FALSE':
+          return{...state, signInDropdown: false  }
+      case 'SET_USER_ROLE_AND_NAME':
+        return{...state , user : {...state.user , role : action.payload.role , name : action.payload.name }}
+      case 'ADD_CUSTOMERS_ARRAY_INTO_STATE':
+        return{...state , userManagment: {...state.userManagment , customers :action.payload}}
+      case 'ADD_SELLERS_ARRAY_INTO_STATE':
+        return{...state , userManagment:{...state.userManagment , sellers : action.payload}}
+      case 'UPDATE_CUSTOMERS_BY_ADMIN':
+        return{...state, userManagment: {...state.userManagment , customers : action.payload} }
+      case 'UPDATE_SELLERS_BY_ADMIN':
+        return{...state, userManagment : {...state.userManagment , sellers : action.payload} }
+      case 'CUSTOMERS_TABLE_ERROR_TRUE':
+        return{...state, userManagment : {...state.userManagment , customersTableError : action.payload }}
+      case 'CUSTOMERS_TABLE_ERROR_FALSE':
+        return{...state, userManagment : {...state.userManagment , customersTableError : action.payload }}
+      case 'SELLERS_TABLE_ERROR_TRUE':
+        return{...state, userManagment : {...state.userManagment , sellersTableError : action.payload }}
+      case 'SELLER_TABLE_ERROR_FALSE':
+        return{...state, userManagment : {...state.userManagment , sellersTableError : action.payload }}
+      case 'DELETED_CUSTOMERS_TABLE_ERROR_TRUE':
+        return{...state, userManagment : {...state.userManagment , deletedCustomerError : action.payload }}
+      case 'DELETED_CUSTOMERS_TABLE_ERROR_FALSE':
+        return{...state, userManagment : {...state.userManagment , deletedCustomerError : action.payload }}
+      case 'DELETED_SELLERS_TABLE_ERROR_TRUE':
+        return{...state , userManagment : {...state.userManagment , deletedSellersError : action.payload}}
+      case 'DELETED_SELLERS_TABLE_ERROR_FALSE':
+        return{...state , userManagment : {...state.userManagment , deletedSellersError : action.payload}}  
+      case 'ADD_DELETED_CUSTOMERS_ARRAY_INTO_STATE':
+        return{...state, userManagment : {...state.userManagment, deletedCustomers : action.payload} }
+      case 'ADD_DELETED_SELLERS_ARRAY_INTO_STATE':
+        return{...state , userManagment : {...state.userManagment , deleteSellers : action.payload }}
+      case 'UPDATE_DELETED_CUSTOMERS_BY_ADMIN':
+        return{...state , userManagment : {...state.userManagment , deletedCustomers : action.payload}  }
+      case 'UPDATE_DELETED_SELLERS_BY_ADMIN':
+        return{...state, userManagment : {...state.userManagment , deleteSellers : action.payload}}
+      case 'SET_SELECTED_CUSTOMERS': 
+        return{...state, userManagment: {...state.userManagment , tempStates : {...state.userManagment.tempStates , selectedCustomers : action.payload }  }}
+      case 'EMPTY_SELECTED_CUSTOMERS': 
+        return{...state, userManagment: {...state.userManagment , tempStates : {...state.userManagment.tempStates , selectedCustomers : [] }  }}
+      case 'EMPTY_DELETED_CUSTOMERS': 
+        return{...state, userManagment: {...state.userManagment , tempStates : {...state.userManagment.tempStates , deletedCustomers : [] }  }}
+      case 'SET_DELETED_CUSTOMERS': 
+        return{...state, userManagment: {...state.userManagment , tempStates : {...state.userManagment.tempStates , deletedCustomers : action.payload }  }}
+      case 'EMPTY_SELECTED_SELLERS': 
+        return{...state, userManagment: {...state.userManagment , tempStates : {...state.userManagment.tempStates , selectedSellers : [] }  }}
+      case 'SET_SELECTED_SELLERS': 
+        return{...state, userManagment: {...state.userManagment , tempStates : {...state.userManagment.tempStates , selectedSellers : action.payload }  }}
+      case 'EMPTY_DELETED_SELLERS': 
+        return{...state, userManagment: {...state.userManagment , tempStates : {...state.userManagment.tempStates , deletedSellers : [] }  }}
+      case 'SET_DELETED_SELLERS': 
+        return{...state, userManagment: {...state.userManagment , tempStates : {...state.userManagment.tempStates , deletedSellers : action.payload }  }}
+      case 'GET_ALL_PRODUCTS_FOR_ADMIN':
+        return{...state, productManagement: {...state.productManagement , products : action.payload}}
+      case 'PRODUCTS_TABLE_ERROR_TRUE':
+        return{...state , productManagement: {...state.productManagement , productsTableError : true } }
+      case 'PRODUCTS_TABLE_ERROR_FALSE':
+        return{...state, productManagement: {...state.productManagement , productsTableError : false} }
+      case 'SET_SELECTED_PRODUCTS':
+        return{...state, productManagement: {...state.productManagement , tempStates : {...state.productManagement.tempStates , selectedProducts : action.payload } } }
+      case 'UPDATE_PRODUCTS_BY_ADMIN':
+        return{...state, productManagement: {...state.productManagement , products : action.payload }}
+      case 'EMPTY_SELECTED_PRODUCTS':
+        return{...state , productManagement:{...state.productManagement , tempStates : {...state.productManagement.tempStates , selectedProducts: [] }} }
+      case 'PRODUCTS_DELETED_TABLE_ERROR_TRUE':
+        return{...state , productManagement:{...state.productManagement, deletedProductsTableError: true } }
+      case 'GET_ALL_DELETED_PRODUCTS_FOR_ADMIN':
+        return{...state , productManagement:{...state.productManagement , deletedProducts : action.payload }}
+      case 'PRODUCTS_DELETED_TABLE_ERROR_FALSE':
+        return{...state , productManagement:{...state.productManagement, deletedProductsTableError: false } }
+      case 'UPDATE_DELETED_PRODUCTS_BY_ADMIN':
+        return{...state , productManagement:{...state.productManagement , deletedProducts : action.payload }}
+      case 'SET_SELECTED_DELETED_PRODUCTS':
+        return{...state , productManagement:{...state.productManagement , tempStates : {...state.productManagement.tempStates , selectedDeletedProducts : action.payload }}}
+      case 'SET_SELECTED_DELETED_PRODUCTS':
+        return{...state , productManagement:{...state.productManagement , tempStates : {...state.productManagement.tempStates , selectedDeletedProducts : [] }}}
         
 
     default:

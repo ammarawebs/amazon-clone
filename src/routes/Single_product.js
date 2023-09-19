@@ -30,7 +30,7 @@ const Single_product = () => {
   // console.log(rating.rate)
 
   useEffect(()=>{
-    getSingleProduct(`${API}/${id}`)
+    getSingleProduct(id)
 
   },[])
 
