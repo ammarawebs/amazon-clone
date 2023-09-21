@@ -1,9 +1,10 @@
 import React from 'react'
 import { FcGoogle } from "react-icons/fc";
 import { Link } from 'react-router-dom';
-import { AiOutlineLoading } from "react-icons/ai";
+
 import { useProductContext } from '../context/ProductContext';
 import ErrorBox from './ErrorBox';
+import Loader from './Loader';
 
 
 const Auth = () => {
@@ -44,7 +45,7 @@ const Auth = () => {
         : registerError === 'someone-logged-in' ? <ErrorBox color='red' heading='There was a problem' msg='Some User already Logged in Please logged out first' /> 
         : googleError === 'someone-logged-in' ? <ErrorBox color='red' heading='There was a problem' msg='Some User already Logged in Please logged out first' /> 
         : googleError === 'network-error' ? <ErrorBox color='red' heading='Network problem' msg='Sorry there are some network Issues' />
-        : registerLoading ? <div className='loading_icon'><AiOutlineLoading size='30px' /></div> : <></> }
+        : registerLoading ? <Loader/> : <></> }
        
           <div className="auth_box">
             <div className="auth_heading_div">

@@ -25,7 +25,7 @@ const Table = ({ loading, rows, columns, onRowSelectionModelChange, rowHeight })
           },
         }}
         pageSizeOptions={[5, 10]}
-        checkboxSelection 
+        checkboxSelection  
         onRowSelectionModelChange={onRowSelectionModelChange}
         style={{
           borderRadius: '10px',

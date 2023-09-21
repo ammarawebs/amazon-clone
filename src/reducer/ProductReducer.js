@@ -29,10 +29,24 @@ const ProductReducer = (state, action) => {
     case "SET_SINGLE_PRODUCT":
       return {
         ...state,
-        isSinlgleLoading: false,
         singleProduct: action.payload,
       };
-      break;
+    case 'CONSOLE_SINGLE_PRODUCT':
+      console.log(state.singleProduct)
+      return state
+    case 'SET_SINGLE_LOADING_FALSE':
+      return{...state, isSinlgleLoading : false }
+    case 'SET_SINGLE_PRODUCT_TITLE':
+      return{...state , singleProduct : {...state.singleProduct,  title : action.payload }}
+    case 'SET_SINGLE_PRODUCT_PRICE':
+      return{...state , singleProduct: {...state.singleProduct, price : Number(action.payload)}}
+    case 'SET_SINGLE_PRODUCT_CATEGORY':
+      return{...state , singleProduct: {...state.singleProduct, category : action.payload}}
+    case 'SET_SINGLE_PRODUCT_DESCRIPTION':
+      return{...state , singleProduct : {...state.singleProduct , description : action.payload } }
+    case 'SET_SINGLE_PRODUCT_IMAGE':
+      console.error(action.payload)
+      return{...state, singleProduct: {...state.singleProduct , image : action.payload}}
     case "SET_SINGLE_ERROR":
       return { ...state, isSinlgleLoading: false, isError: true };
       break;

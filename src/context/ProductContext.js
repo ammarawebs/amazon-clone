@@ -4,6 +4,8 @@ import reducer from '../reducer/ProductReducer';
 import { auth ,db } from "../config/firebase-config";
 import { createUserWithEmailAndPassword , signInWithEmailAndPassword , signOut, GoogleAuthProvider , signInWithPopup,  } from "firebase/auth";
 import {addDoc ,collection , query, where, getDocs, updateDoc, getDoc , doc} from 'firebase/firestore'
+import {useNavigate} from 'react-router-dom'
+
 
 
 
@@ -20,7 +22,14 @@ const initialState ={
     isError: false, 
     products : [],
     isSinlgleLoading: false,
-    singleProduct: {}, 
+    singleProduct: {
+      title : '',
+      category :'',
+      description :'',
+      image : '',
+      price : '',
+  
+    }, 
     cartItem : [],
     isCart : false,
     totalQuantity : 0,
@@ -137,9 +146,9 @@ const initialState ={
 
 const  AppProvider = ({children}) => {
 
+  let navigate = useNavigate();
     
-    
-    
+        
     const [state , dispatch] = useReducer(reducer , initialState)
     const cUser = useRef('')
 
@@ -150,7 +159,41 @@ const  AppProvider = ({children}) => {
 
 
 
+    const singleProductEdited = async (id) => {
+      dispatch({ type: "SET_SINGLE_LOADING" });
+      try {
+        const numId = Number(id);
+        const q = query(productsCollectionRef, where("id", "==", numId));
 
+        const querySnapshot = await getDocs(q);
+
+        if (!querySnapshot.empty) {
+          const docRef = querySnapshot.docs[0].ref;
+
+          const updatedProduct = {
+            title : state.singleProduct.title,
+            category : state.singleProduct.category,
+            description : state.singleProduct.description,
+            price : state.singleProduct.price,
+            image : state.singleProduct.image,
+          }
+
+          await updateDoc(docRef, updatedProduct);
+
+          console.log("Product updated successfully:", updatedProduct);
+
+
+          dispatch({ type: "SET_SINGLE_LOADING_FALSE" });
+          return navigate('/admin-dashboard/product-management');
+        } else {
+          console.error("No matching document found.");
+        }
+      } catch (error) {
+        console.error("Error updating product:", error);
+        dispatch({ type: "SET_SINGLE_ERROR" });
+      }
+    };
+    
 
     const getProductsStatus = async ()=>{
 
@@ -1396,6 +1439,8 @@ const  AppProvider = ({children}) => {
           console.log(singleProduct);
     
           dispatch({ type: 'SET_SINGLE_PRODUCT', payload: singleProduct });
+          // dispatch({type: 'CONSOLE_SINGLE_PRODUCT'})
+          dispatch({ type: 'SET_SINGLE_LOADING_FALSE'})
         } else {
           console.error('No matching document found.');
         }
@@ -1473,7 +1518,7 @@ const  AppProvider = ({children}) => {
     },[state.currentUser])
 
     return <AppContext.Provider value={{...state, getSingleProduct , GettingCartItem, cartHandling ,cartItemIncreament ,cartItemDecreament ,dispatch , createUser , loginTheUser , cUser , logOut, signUpWithGoogle ,addDoc , usersCollectionRef, vendorEmail, vendorDetails , vendorBusinessDetails, getCustomersForAdmin , getSellersForAdmin, getDeletedCustomersForAdmin, getDeletedSellersForAdmin,
-    deleteSelectedCustomers, deleteDeletedCustomers, deleteSelectedSellers, deleteDeletedSellers, getAllProductsForAdmin, handleEditProductClick, deleteSelectedProducts, getProductsStatus, getAllDeletedProductsForAdmin, deleteDeletedProducts}}>{children}</AppContext.Provider>
+    deleteSelectedCustomers, deleteDeletedCustomers, deleteSelectedSellers, deleteDeletedSellers, getAllProductsForAdmin, handleEditProductClick, deleteSelectedProducts, getProductsStatus, getAllDeletedProductsForAdmin, deleteDeletedProducts, singleProductEdited}}>{children}</AppContext.Provider>
 }
 
 // custom hook
