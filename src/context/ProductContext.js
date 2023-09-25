@@ -5,6 +5,9 @@ import { auth ,db } from "../config/firebase-config";
 import { createUserWithEmailAndPassword , signInWithEmailAndPassword , signOut, GoogleAuthProvider , signInWithPopup,  } from "firebase/auth";
 import {addDoc ,collection , query, where, getDocs, updateDoc, getDoc , doc} from 'firebase/firestore'
 import {useNavigate} from 'react-router-dom'
+import {loadStripe} from '@stripe/stripe-js'
+const { createProductInStripe, createProductsInStripe } = require('../Node/stripeIntegrations'); // Adjust the path as needed
+
 
 
 
@@ -15,6 +18,7 @@ const AppContext = createContext()
 const API = 'https://fakestoreapi.com/products'
 
 const geoLoactionApi = 'https://ipinfo.io/json?token=4509f330d8179a'
+
 
 
 const initialState ={
@@ -30,6 +34,19 @@ const initialState ={
       price : '',
   
     }, 
+    addSingleProduct : {
+      id : 0,
+      title: '', 
+      category : '',
+      description: '',
+      image : '',
+      price : '',
+      status : 'active',
+      rating: {
+        count : 0,
+        rate : 0,
+      }
+    },
     cartItem : [],
     isCart : false,
     totalQuantity : 0,
@@ -140,6 +157,11 @@ const initialState ={
 
 
 
+function generateUniqueNumberId() {
+  const timestamp = new Date().getTime(); // Get current timestamp in milliseconds
+  const uniqueId = parseInt(`${timestamp}${Math.floor(Math.random() * 1000)}`, 10); // Append a random number
+  return uniqueId;
+}
 
 
 
@@ -156,7 +178,47 @@ const  AppProvider = ({children}) => {
     const productsCollectionRef = collection(db, 'products');
     const googleProvider = new GoogleAuthProvider
 
+     
 
+    const checkout = async(totalPrice)=>{
+
+    }
+
+    const addProductForAdmin = async () => {
+      dispatch({ type: "SET_SINGLE_LOADING" });
+      const uniqueId = generateUniqueNumberId();
+    
+      const productData = {
+        id: uniqueId,
+        title: state.addSingleProduct.title,
+        category: state.addSingleProduct.category,
+        description: state.addSingleProduct.description,
+        image: state.addSingleProduct.image,
+        price: state.addSingleProduct.price,
+        status: 'active',
+        rating: state.addSingleProduct.rating,
+      };
+    
+      try {
+        // Add the product to Firestore
+        const docRef = await addDoc(productsCollectionRef, productData);
+        console.log("Product added with ID: ", docRef.id);
+        
+        // Create the product in Stripe
+        const stripeProductData = await createProductInStripe(productData);
+    
+        dispatch({ type: "SET_SINGLE_LOADING_FALSE" });
+        dispatch({ type: 'SET_ADD_PRODUCT_EMPTY' });
+        getProducts();
+        return navigate('/admin-dashboard/product-management');
+    
+      } catch (error) {
+        console.error("Error adding product: ", error);
+        throw error;
+      }
+    };
+    
+    
 
 
     const singleProductEdited = async (id) => {
@@ -184,7 +246,9 @@ const  AppProvider = ({children}) => {
 
 
           dispatch({ type: "SET_SINGLE_LOADING_FALSE" });
+          getProducts()
           return navigate('/admin-dashboard/product-management');
+          
         } else {
           console.error("No matching document found.");
         }
@@ -197,18 +261,22 @@ const  AppProvider = ({children}) => {
 
     const getProductsStatus = async ()=>{
 
+      let products = [] 
+
       try {
         const querySnapshot = await getDocs(productsCollectionRef);
+
         
-        // Loop through each document in the collection
-        querySnapshot.forEach(async (doc) => {
-          // Update the document with the new 'status' field
-          await updateDoc(doc.ref, {
-            status: 'active'
-          });
+        
+        await querySnapshot.forEach((doc) => {
+          // Access the data of each document and log it
+          products.push(doc.data()) 
         });
+
+        // createProductsInStripe(products)
+
         
-        console.log('Status updated for all products.');
+        console.log('Status updated for all products.', products);
       } catch (error) {
         console.error('Error updating status:', error);
       }
@@ -1518,7 +1586,7 @@ const  AppProvider = ({children}) => {
     },[state.currentUser])
 
     return <AppContext.Provider value={{...state, getSingleProduct , GettingCartItem, cartHandling ,cartItemIncreament ,cartItemDecreament ,dispatch , createUser , loginTheUser , cUser , logOut, signUpWithGoogle ,addDoc , usersCollectionRef, vendorEmail, vendorDetails , vendorBusinessDetails, getCustomersForAdmin , getSellersForAdmin, getDeletedCustomersForAdmin, getDeletedSellersForAdmin,
-    deleteSelectedCustomers, deleteDeletedCustomers, deleteSelectedSellers, deleteDeletedSellers, getAllProductsForAdmin, handleEditProductClick, deleteSelectedProducts, getProductsStatus, getAllDeletedProductsForAdmin, deleteDeletedProducts, singleProductEdited}}>{children}</AppContext.Provider>
+    deleteSelectedCustomers, deleteDeletedCustomers, deleteSelectedSellers, deleteDeletedSellers, getAllProductsForAdmin, handleEditProductClick, deleteSelectedProducts, getProductsStatus, getAllDeletedProductsForAdmin, deleteDeletedProducts, singleProductEdited , addProductForAdmin, checkout}}>{children}</AppContext.Provider>
 }
 
 // custom hook

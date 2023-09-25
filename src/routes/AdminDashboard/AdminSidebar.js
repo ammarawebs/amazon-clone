@@ -11,6 +11,8 @@ const AdminSidebar = () => {
               <div className="admin_sidebar_navbar">
                 <Link_text link='/admin-dashboard/user-management' title='User Management' color='white' />
                 <Link_text link='/admin-dashboard/product-management' title='Product Management' color='white' />
+                <Link_text link='/admin-dashboard/add-product' title='Add New Product' color='white' />
+
               </div>
 
               <div className='admin_logout_section'>

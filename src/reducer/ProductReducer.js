@@ -440,7 +440,18 @@ const ProductReducer = (state, action) => {
         return{...state , productManagement:{...state.productManagement , tempStates : {...state.productManagement.tempStates , selectedDeletedProducts : action.payload }}}
       case 'SET_SELECTED_DELETED_PRODUCTS':
         return{...state , productManagement:{...state.productManagement , tempStates : {...state.productManagement.tempStates , selectedDeletedProducts : [] }}}
-        
+      case 'SET_ADD_PRODUCT_TITLE':
+        return{...state , addSingleProduct:{...state.addSingleProduct, title: action.payload }}
+      case 'SET_ADD_PRODUCT_CATEGORY':
+        return{...state , addSingleProduct:{...state.addSingleProduct, category: action.payload } }
+      case 'SET_ADD_PRODUCT_DESCRIPTION':
+        return{...state , addSingleProduct:{...state.addSingleProduct, description: action.payload }}
+      case 'SET_ADD_PRODUCT_PRICE':
+        return{...state, addSingleProduct:{...state.addSingleProduct, price: Number(action.payload) } }
+      case 'SET_ADD_PRODUCT_IMAGE':
+        return{...state, addSingleProduct:{...state.addSingleProduct, image : action.payload}}
+      case 'SET_ADD_PRODUCT_EMPTY':
+        return{...state, addSingleProduct:{...state.addSingleProduct, title : '', category : '', description: '', price : '', image :''}}
 
     default:
       return state;

@@ -163,6 +163,7 @@ body{
   flex-direction: column;
   justify-content: center;
   align-items: stretch;
+  
   width: 100%;
 }
 
@@ -662,7 +663,19 @@ select.goog-te-combo{
   margin-bottom: 50px;
 }
 
-
+.cart_checkout_button{
+  width: 80%;
+}
+.checkout_page{
+  display: flex;
+  flex-direction: column;
+  height: 80vh;
+  width: auto;
+  align-items: center;
+  justify-content: center;
+  color: black;
+  
+}
 
 
 

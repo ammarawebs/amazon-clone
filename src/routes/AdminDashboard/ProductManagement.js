@@ -41,7 +41,7 @@ const ProductManagement = () => {
         sortable: false,
         width: 160,
         valueGetter: (params: GridValueGetterParams) =>
-          `${params.row.rating.count || ''}`,
+          `${params.row.rating.count}`,
       },
       {
         field: 'rating',
@@ -50,7 +50,7 @@ const ProductManagement = () => {
         sortable: false,
         width: 160,
         valueGetter: (params: GridValueGetterParams) =>
-          `${params.row.rating.rate || ''}`,
+          `${params.row.rating.rate }`,
       },
       // Add a new column for the edit button
       {
@@ -73,6 +73,7 @@ const ProductManagement = () => {
     useEffect(()=>{
       getAllProductsForAdmin()
       getAllDeletedProductsForAdmin()
+      console.log()
     }, [])
 
 
@@ -81,9 +82,12 @@ const ProductManagement = () => {
     <>
         <div className="product_management_content">
             <h1>Product Management</h1>
-            
+
+            <Link to='/admin-dashboard/add-product'><Button  title='Add New Product' /></Link>
+            <Button title='Console Products' onclick={getProductsStatus}/>
             <div className="product_management_table">
                   <h1 className='product_management_table_heading'>All Products</h1>
+                  
                   <div className="product_table" style={{ height: 600, width: '100%'  }}>
                   
                   <Table  
@@ -95,10 +99,13 @@ const ProductManagement = () => {
                       dispatch({type: 'SET_SELECTED_PRODUCTS', payload : newRowSelectionModel })
                       
                     }} rowHeight='100'/>
+
+                   
                    { productManagement.tempStates.selectedProducts.length !== 0 ? <Button onclick={deleteSelectedProducts} title='Delete Selected Customers'/> : <></>
                    }
                    
                   </div>
+                  
                 </div>
 
                 <div className="deleted_product_table">

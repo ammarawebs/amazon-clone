@@ -16,6 +16,8 @@ import SellerDashboard from './routes/SellerDashboard';
 import UserManagementContent from './routes/AdminDashboard/UserManagementContent';
 import ProductManagement from './routes/AdminDashboard/ProductManagement';
 import SingleProductEdit from './routes/AdminDashboard/SingleProductEdit';
+import AddNewProduct from './routes/AdminDashboard/AddNewProduct';
+import CheckoutPage from './routes/CheckoutPage';
 // import VendorDetails from './authentication/vendor/VendorDetails';
 
 
@@ -41,6 +43,7 @@ function App() {
             <Route path="user-management" element={<UserManagementContent />} />
             <Route path="product-management" element={<ProductManagement/>}/>
             <Route path={`edit-product/:id`}  element={<SingleProductEdit/>} />
+            <Route path='add-product' element={<AddNewProduct/>} />
           </Route>
           
           <Route path='/' element={<HomePage />}/>
@@ -48,6 +51,8 @@ function App() {
           <Route path='/sign-up' element={<Auth />}/>
           <Route path='/log-in' element={<Login />}/>
           <Route path='/become-a-seller' element={<Vendor/>}/>
+          <Route path='/checkout-page' element={<CheckoutPage/>}/>
+          
 
    
 
