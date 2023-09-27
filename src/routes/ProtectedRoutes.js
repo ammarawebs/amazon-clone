@@ -10,11 +10,11 @@ const ProtectedRoutes = () => {
  const {dispatch , user} = useProductContext()
 
 
-if(auth?.currentUser?.email){
-  return user.role === 'buyer' ? <Outlet /> : <Navigate to="/" />;
+if(auth?.currentUser?.email == undefined){
+  return <Navigate to="/" />
 }
 else{
-  return <Navigate to="/" />
+  return <Outlet /> 
 }
 
  

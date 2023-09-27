@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom'
 import { useProductContext } from '../context/ProductContext'
 import Pagenavigation from '../components/Pagenavigation'
 import AddToCart from '../components/AddToCart'
+import Loader from '../authentication/Loader'
 
 
 
@@ -39,7 +40,7 @@ const Single_product = () => {
     <>  
     <Pagenavigation title={title}/>
     <div  className='sp_loading'>
-      { isSinlgleLoading  ? <h1>loading...</h1> : <div className='single_product_main'>
+      { isSinlgleLoading  ? <h1><Loader marginTop='100px' size='40px'/></h1> : <div className='single_product_main'>
           <div className="single_product_second_main">
             <div className="sp_image_sec">
               <img className='sp_image' src={image} alt="" />

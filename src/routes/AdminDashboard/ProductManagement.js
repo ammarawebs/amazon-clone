@@ -84,7 +84,7 @@ const ProductManagement = () => {
             <h1>Product Management</h1>
 
             <Link to='/admin-dashboard/add-product'><Button  title='Add New Product' /></Link>
-            <Button title='Console Products' onclick={getProductsStatus}/>
+            {/* <Button onclick={getProductsStatus} title ='Show Stripe Products'/> */}
             <div className="product_management_table">
                   <h1 className='product_management_table_heading'>All Products</h1>
                   

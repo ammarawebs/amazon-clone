@@ -2,7 +2,7 @@
 import React ,{ useEffect, useReducer, useState } from 'react';
 import './App.css';
 import axios from './axios';
-import {  Route , Routes } from 'react-router-dom';
+import {  Route , Routes , useNavigate } from 'react-router-dom';
 import HomePage from './routes/HomePage';
 import Single_product from './routes/Single_product';
 import Navbar from './components/Navbar';
@@ -19,10 +19,13 @@ import SingleProductEdit from './routes/AdminDashboard/SingleProductEdit';
 import AddNewProduct from './routes/AdminDashboard/AddNewProduct';
 import CheckoutPage from './routes/CheckoutPage';
 // import VendorDetails from './authentication/vendor/VendorDetails';
+import NotFound from './routes/NotFound';
+import PaymentSucces from './routes/PaymentSucces';
+import PaymentCancel from './routes/PaymentCancel';
 
 
 function App() {
-  
+  let navigate = useNavigate();
    
 
   return (
@@ -52,6 +55,11 @@ function App() {
           <Route path='/log-in' element={<Login />}/>
           <Route path='/become-a-seller' element={<Vendor/>}/>
           <Route path='/checkout-page' element={<CheckoutPage/>}/>
+          <Route path="*" element={<NotFound />} />
+          <Route path="/success" element={<PaymentSucces />} />
+          <Route path="/cancel" element={<PaymentCancel />} />
+
+
           
 
    

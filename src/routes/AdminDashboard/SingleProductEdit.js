@@ -72,12 +72,12 @@ const SingleProductEdit = () => {
           image
         </label>
         <div className="single_product_image_edit">
-        { isSinlgleLoading? <Loader/> : <img src={image} alt="" style={{height: 'auto', width: '200px'}}  />}
+        { isSinlgleLoading? <Loader size='30px'/> : <img src={image} alt="" style={{height: 'auto', width: '200px'}}  />}
         </div>
         
         <input type="file" id="auth_fname" className="auth_input" onChange={handleImageChange}/>
 
-        <Button title='Update Product' type='button' onclick={()=>singleProductEdited(id)} />
+        <Button title={isSinlgleLoading? <div style={{height: '20px', width: '100%' , display: "flex" , justifyContent: 'center'}}><Loader size='20px' width='20px' height='20px'/></div>: 'Update Product'} type='button' onclick={()=>singleProductEdited(id)} />
 
         
        

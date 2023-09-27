@@ -5,6 +5,7 @@ import { AiOutlineLoading } from "react-icons/ai";
 import { useProductContext } from '../../context/ProductContext';
 import { auth ,db } from "../../config/firebase-config";
 import ErrorBox from '../ErrorBox';
+import Loader from '../Loader';
 
 
 const VendorDetails = () => {
@@ -42,7 +43,7 @@ const VendorDetails = () => {
         : vendorError.details === 'auth/email-already-in-use'   ?  <ErrorBox color='red' heading='There was a Problem' msg='This email address is already in use please try another email or login' /> 
         : vendorError.details === 'signIn' ? <ErrorBox color='green' heading='Sign Up Successful' msg='you are successfully registered to the site' />
         : vendorError.details === 'someone-logged-in' ? <ErrorBox color='red' heading='There was a problem' msg='Some User already Logged in Please logged out first' /> 
-        : vendorLoading ? <div className='loading_icon'><AiOutlineLoading size='30px' /></div> : <></> }
+        : <></> }
 
       <div className="auth_main">
         <div className="auth_second_main">
@@ -77,7 +78,7 @@ const VendorDetails = () => {
                 <input type="tel" id='vendor_phone' className='auth_input' value={vendor.phone} style={vendorInputError.phone? errorStyle : style}   onChange={(e)=>dispatch({type : 'VENDOR_PHONE' , payload : e.target.value})} />
       
               <div className="auth_submit_button">
-                <button type='submit' className='auth_sign_up_button'>Next Step</button>
+                <button type='submit' className='auth_sign_up_button'>{ vendorLoading ? <div style={{height : '20px'}}><Loader size='20px' /></div>:  'Next Step'}</button>
               </div>
               </form>
               {/* <div className="auth_signup_google">

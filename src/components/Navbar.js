@@ -14,9 +14,19 @@ import Logo from './Logo';
 
 
 
+
 const Navbar = () => {
 
-const { isCart, cartHandling, totalQuantity , cUser ,logOut , location, dispatch, signInDropdown, user} = useProductContext()
+const { isCart, cartHandling, totalQuantity , cUser ,logOut , location, dispatch, signInDropdown, user, showSellerAccount , navbar, showAdminAccount , showCustomerAccount, localCartTotalQuantity} = useProductContext()
+
+
+
+
+useEffect(()=>{
+  
+
+},[])
+
 
 
 
@@ -61,7 +71,7 @@ const { isCart, cartHandling, totalQuantity , cUser ,logOut , location, dispatch
         
             <TfiUser size='20px' className='sigin_user'/>
             <div className="loaction_deliver">
-              <p className='deliver_to'>Hello, {auth?.currentUser?.email !== undefined ? user.name : 'Sign In' }</p>
+              <p className='deliver_to'>Hello, {localStorage.getItem('userName')? localStorage.getItem('userName') : 'Sign In' }</p>
               <p className='location_country'>Accounts & Lists</p>
             </div>
 
@@ -70,7 +80,7 @@ const { isCart, cartHandling, totalQuantity , cUser ,logOut , location, dispatch
             {
               signInDropdown? 
               <div className="sign_in_dropdown_section" onMouseLeave={()=>dispatch({type : 'MAKE_SIGNUP_DROPDOWN_FALSE'})} >
-                <div className="sign_in_dropdown_btn_section">
+                {auth?.currentUser ? <></> : <div className="sign_in_dropdown_btn_section">
                   <Link to='/log-in'><Button title='Sign In' width='300px'/></Link>
                   <div className="sign_in_dropdown_btn_text">
                   
@@ -79,17 +89,21 @@ const { isCart, cartHandling, totalQuantity , cUser ,logOut , location, dispatch
                     
                   </div>
                   
-                </div>
+                </div> }
                 <hr className='hrSolid'/>
                 <div className="sign_in_dropdown_link_section">
                   <div className="sign_in_dropdown_link_left">
                     
                     <h3>Your Account</h3>
-                    <Link_text title='Customer Account'  padding='0px' margin='2px 0px' link='/user-dashboard' />
-                    <Link_text title='Seller Account'  padding='0px' margin='2px 0px' link='/seller-dashboard' />
+                    
+                    { localStorage.getItem('loginAccountPage') === 'customerAccount' ?<Link_text title='Customer Account'  padding='0px' margin='2px 0px' link='/user-dashboard' />:<></>}
+                    { localStorage.getItem('loginAccountPage') === 'sellerAccount' ?<Link_text title='Seller Account'  padding='0px' margin='2px 0px' link='/seller-dashboard' />:<></>}
                     <Link_text title='Become a seller'  padding='0px' margin='2px 0px' link='/become-a-seller' />
-                    <Link_text title='admin account'  padding='0px' margin='2px 0px' link='/admin-dashboard' />
-                    <button onClick={logOut}>Log Out</button>
+                    { localStorage.getItem('loginAccountPage') === 'adminAccount' ?<Link_text title='admin account'  padding='0px' margin='2px 0px' link='/admin-dashboard' />:<></>}
+                    {/* <a>{localStorage.getItem('loginAccountPage')}</a> */}
+                    <br/>
+                    {auth?.currentUser?.email !== undefined ? <button onClick={logOut}>Log Out</button> : <></> }
+                    
 
                   </div>
                   <div className='vl'></div>
@@ -141,7 +155,7 @@ const { isCart, cartHandling, totalQuantity , cUser ,logOut , location, dispatch
               
               <button  className='cart_btn' onClick={()=> {cartHandling()}}>
                 <div className='cart_cart'>
-                  <div className="cart_header_quantity"><p>{totalQuantity}</p></div>
+                  <div className="cart_header_quantity"><p>{localCartTotalQuantity}</p></div>
                   <span  className='cart_icon' ></span>
                   
                 </div>

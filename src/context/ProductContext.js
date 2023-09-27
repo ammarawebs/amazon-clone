@@ -6,7 +6,8 @@ import { createUserWithEmailAndPassword , signInWithEmailAndPassword , signOut, 
 import {addDoc ,collection , query, where, getDocs, updateDoc, getDoc , doc} from 'firebase/firestore'
 import {useNavigate} from 'react-router-dom'
 import {loadStripe} from '@stripe/stripe-js'
-const { createProductInStripe, createProductsInStripe } = require('../Node/stripeIntegrations'); // Adjust the path as needed
+import Link_text from "../authentication/Link_text";
+const { createProductInStripe, createProductsInStripe, fetchStripeProducts, fetchStripeAllProducts, updateStripeProduct } = require('../Node/stripeIntegrations'); // Adjust the path as needed
 
 
 
@@ -148,7 +149,15 @@ const initialState ={
         selectedProducts : [],
         selectedDeletedProducts : []
       }
-    }
+    },
+    navbar : {
+      sellerAccount : null,
+      customerAccount : null,
+      adminAccount: null,
+    },
+    localStorageCart : JSON.parse(localStorage.getItem("cart")) || [],
+    localCartTotalQuantity : Number(localStorage.getItem('quantity')) || 0,
+    localCartTotalPrice : Number(localStorage.getItem('price')) || 0,
 
 
 
@@ -180,9 +189,84 @@ const  AppProvider = ({children}) => {
 
      
 
-    const checkout = async(totalPrice)=>{
+        
 
-    }
+    const showAdminAccount = async () => {
+      if (auth?.currentUser) {
+        const uid = auth.currentUser.uid;
+    
+        try {
+          // Query Firestore to check if the user exists with 'buyer' role and the given UID
+          const customerQuerySnapshot = await getDocs(
+            query(usersCollectionRef, where('role', '==', 'admin'), where('id', '==', uid))
+          );
+    
+          if (!customerQuerySnapshot.empty) {
+            // User with 'buyer' role and the given UID exists, return the "Seller" div
+            dispatch({type : 'MAKE_ADMIN_ACCOUNT_TRUE'})
+          }
+        } catch (error) {
+          // Handle any errors that may occur during the Firestore query
+          console.error('Error checking user role:', error);
+        }
+      }
+      
+      
+      
+    };
+
+    const showSellerAccount = async () => {
+      if (auth?.currentUser) {
+        const uid = auth.currentUser.uid;
+    
+        try {
+          // Query Firestore to check if the user exists with 'buyer' role and the given UID
+          const customerQuerySnapshot = await getDocs(
+            query(usersCollectionRef, where('role', '==', 'buyer'), where('id', '==', uid))
+          );
+    
+          if (!customerQuerySnapshot.empty) {
+            // User with 'buyer' role and the given UID exists, return the "Seller" div
+            dispatch({type : 'MAKE_CUSTOMER_ACCOUNT_TRUE'})
+          }
+        } catch (error) {
+          // Handle any errors that may occur during the Firestore query
+          console.error('Error checking user role:', error);
+        }
+      }
+      
+      
+      
+    };
+
+
+    const showCustomerAccount = async () => {
+      if (auth?.currentUser) {
+        const uid = auth.currentUser.uid;
+    
+        try {
+          // Query Firestore to check if the user exists with 'buyer' role and the given UID
+          const customerQuerySnapshot = await getDocs(
+            query(usersCollectionRef, where('role', '==', 'seller') , where('id', '==', uid))
+          );
+    
+          if (!customerQuerySnapshot.empty) {
+            console.error('USER <<<<<', customerQuerySnapshot )
+            // User with 'buyer' role and the given UID exists, return the "Seller" div
+            dispatch({type : 'MAKE_SELLER_ACCOUNT_TRUE'})
+          }
+        } catch (error) {
+          // Handle any errors that may occur during the Firestore query
+          console.error('Error checking user role:', error);
+        }
+      }
+      else{
+        
+      }
+      
+      
+      
+    };
 
     const addProductForAdmin = async () => {
       dispatch({ type: "SET_SINGLE_LOADING" });
@@ -241,8 +325,10 @@ const  AppProvider = ({children}) => {
           }
 
           await updateDoc(docRef, updatedProduct);
+          
+          await updateStripeProduct(id , updatedProduct)
 
-          console.log("Product updated successfully:", updatedProduct);
+          
 
 
           dispatch({ type: "SET_SINGLE_LOADING_FALSE" });
@@ -261,19 +347,20 @@ const  AppProvider = ({children}) => {
 
     const getProductsStatus = async ()=>{
 
-      let products = [] 
+      // let products = [] 
 
       try {
-        const querySnapshot = await getDocs(productsCollectionRef);
+      //   const querySnapshot = await getDocs(productsCollectionRef);
 
         
         
-        await querySnapshot.forEach((doc) => {
-          // Access the data of each document and log it
-          products.push(doc.data()) 
-        });
+      //   await querySnapshot.forEach((doc) => {
+      //     // Access the data of each document and log it
+      //     products.push(doc.data()) 
+      //   });
 
-        // createProductsInStripe(products)
+      //   await createProductsInStripe(products)
+      const products = await fetchStripeAllProducts();
 
         
         console.log('Status updated for all products.', products);
@@ -721,7 +808,6 @@ const  AppProvider = ({children}) => {
 
     const fetchUserRole = async () => {
         try {
-
           
           if (auth?.currentUser) {
    
@@ -735,6 +821,8 @@ const  AppProvider = ({children}) => {
         
                 
               const userData = querySnapshot.docs[0].data();
+
+              console.error('USER>>>>>>',userData.firstname)
      
               dispatch({type : 'SET_USER_ROLE_AND_NAME' , payload : {
                 role : userData.role,
@@ -770,7 +858,7 @@ const  AppProvider = ({children}) => {
 
 
 
-    const vendorBusinessDetails =async(e)=>{
+    const createSeller =async(e)=>{
         e.preventDefault()
         if(auth?.currentUser?.email !== undefined){
             if(state.vendor.bName ==='' || state.vendor.bDescription === '' || state.vendor.city ==='' || state.vendor.country === '' || state.vendor.address === '' ){
@@ -844,6 +932,9 @@ const  AppProvider = ({children}) => {
                           showCurrentUser()
                           dispatch({type : 'VENDOR_EMPTY_REGISTER_FORM' })      
                           dispatch({type : 'REGISTER_NO_ERROR' })
+                          fetchUserRole();
+                          dispatch({type : 'EMPTY_VENDOR_ERRORS'})
+                          return navigate('/');
                         }
             
                         
@@ -960,6 +1051,9 @@ const  AppProvider = ({children}) => {
                             await addDoc(usersCollectionRef, vendorUser);
                             dispatch({type : 'VENDOR_EMPTY_REGISTER_FORM' })      
                             dispatch({type : 'REGISTER_NO_ERROR' })
+                            fetchUserRole();
+                            dispatch({type : 'EMPTY_VENDOR_ERRORS'})
+                            return navigate('/');
             
                         }
                         
@@ -1167,7 +1261,8 @@ const  AppProvider = ({children}) => {
                 console.log('Email already exists in the collection.');
                 // Handle the case where the email is already registered, e.g., show an error message.
                 dispatch({ type: 'GOOGLE_SIGN_UP', payload: 'google new sign up' });
-                return; // Exit the function to prevent adding duplicate users.
+                dispatch({type : 'SET_GOOGLE_USER_NAME', payload : name })
+                return navigate('/'); // Exit the function to prevent adding duplicate users.
         
                 }
           
@@ -1189,7 +1284,8 @@ const  AppProvider = ({children}) => {
             
               await addDoc(usersCollectionRef, googleUser);
               dispatch({ type: 'GOOGLE_SIGN_UP', payload: 'google new sign up ' });
-        
+              dispatch({type : 'SET_GOOGLE_USER_NAME', payload : name })
+              return navigate('/'); 
                } catch (error) {
                 if (error.code === 'auth/internal-error') {
                     console.log(error.code)
@@ -1213,7 +1309,10 @@ const  AppProvider = ({children}) => {
         const logOut = async()=>{
             signOut(auth)
             dispatch({type : 'LOGOUT_USER' , payload : 'logout'})
+            dispatch({type : 'MAKE_ACCOUNT_FALSE'})
+            
             showCurrentUser()
+            
         }
 
 
@@ -1260,9 +1359,16 @@ const  AppProvider = ({children}) => {
             showCurrentUser();
             if (user.operationType === 'signIn') {
               dispatch({ type: 'USER_FOUND', payload: user.operationType });
+              showSellerAccount()
+              showCustomerAccount()
+              showAdminAccount()
+              fetchUserRole();
+              dispatch({ type: 'PLEASE_LOG_OUT_FIRST_LOGIN_RESOLVE' });
+              return navigate('/');
             }
           } catch (error) {
             // Handle sign-in errors here
+            console.log('OOH MY GOD',error)
             if (error.code === 'auth/wrong-password') {
               dispatch({ type: 'WRONG_PASSWORD', payload: error.code });
               console.log(error);
@@ -1272,7 +1378,7 @@ const  AppProvider = ({children}) => {
             } else if (error.code === 'auth/network-request-failed') {
               dispatch({ type: 'NETWORK_ERROR', payload: error.code });
             } else {
-              console.log(error);
+              console.error(error);
             }
           }
         } else {
@@ -1284,6 +1390,7 @@ const  AppProvider = ({children}) => {
       } else {
         // User does not exist in the "users" collection
         console.log('User not found.');
+        dispatch({type : 'LOGIN_USER_NOT_FOUND' , payload: 'auth/user-not-found' })
         // Handle this case as needed (e.g., show an error message)
       }
     }
@@ -1354,6 +1461,10 @@ const  AppProvider = ({children}) => {
                 await addDoc(usersCollectionRef, createRegisterUser);
                 dispatch({type : 'EMPTY_REGISTER_FORM' })      
                 dispatch({type : 'REGISTER_NO_ERROR' })
+                fetchUserRole();
+                dispatch({type: 'PLEASE_LOG_OUT_FIRST_REGISTER_RESOLVE'})
+                return navigate('/');
+
 
             }
             
@@ -1521,22 +1632,25 @@ const  AppProvider = ({children}) => {
 
 
     const GetTotalQuantityPrice = ()=>{
-        dispatch({type : 'TOTAL_QUANTITY_PRICE'})
-
-        console.log(state.totalPrice)
-        console.log(state.totalQuantity)
+        dispatch({type : 'TOTAL_QUANTITY_PRICE', payload : {
+          localCart : state.localStorageCart,
+          localPrice : state.localCartTotalPrice,
+          localQuantity : state.localCartTotalQuantity,
+        }})
     }
 
     const GettingCartItem = (item)=>{
-
-        dispatch({type: 'GETTING_CART_ITEM' , payload : item})
-
-        GetTotalQuantityPrice()
-
-      
-
+        console.error('RUNNED')
+        
+        dispatch({type: 'GETTING_CART_ITEM' , payload : {
+          item : item,
+          localCart : state.localStorageCart,
+          localQuantity : state.localCartTotalQuantity,
+          localPrice : state.localCartTotalPrice,
+        } })
+        // GetTotalQuantityPrice()
         console.log(state.cartItem)
-
+        
         
     }
 
@@ -1547,20 +1661,22 @@ const  AppProvider = ({children}) => {
     const cartItemIncreament = (item , product) =>{
         dispatch({type : 'CART_ITEM_INCREAMENT' , payload: {
             item: item,
-            product: product
+            product: product,
+            localCart : state.localStorageCart,
         }})
 
 
-        GetTotalQuantityPrice()
+        // GetTotalQuantityPrice()
     }
     const cartItemDecreament = (item , product) =>{
         dispatch({type : 'CART_ITEM_DECREAMENT' , payload: {
             item: item,
-            product: product
+            product: product,
+            localCart : state.localStorageCart,
         }})
 
 
-        GetTotalQuantityPrice()
+        // GetTotalQuantityPrice()
     }
 
     
@@ -1573,20 +1689,25 @@ const  AppProvider = ({children}) => {
            
         getGeoLocationApi(geoLoactionApi)
 
-        fetchUserRole();
+       
         getCustomersForAdmin()
         getSellersForAdmin()
 
         getDeletedCustomersForAdmin()
         getDeletedSellersForAdmin()
+        // showSellerAccount()
+        // showCustomerAccount()
+        // showAdminAccount()
+      
+       
 
         console.log('USER NAME >>>>> ', state.user.name)
         console.log('i fire once');
 
     },[state.currentUser])
 
-    return <AppContext.Provider value={{...state, getSingleProduct , GettingCartItem, cartHandling ,cartItemIncreament ,cartItemDecreament ,dispatch , createUser , loginTheUser , cUser , logOut, signUpWithGoogle ,addDoc , usersCollectionRef, vendorEmail, vendorDetails , vendorBusinessDetails, getCustomersForAdmin , getSellersForAdmin, getDeletedCustomersForAdmin, getDeletedSellersForAdmin,
-    deleteSelectedCustomers, deleteDeletedCustomers, deleteSelectedSellers, deleteDeletedSellers, getAllProductsForAdmin, handleEditProductClick, deleteSelectedProducts, getProductsStatus, getAllDeletedProductsForAdmin, deleteDeletedProducts, singleProductEdited , addProductForAdmin, checkout}}>{children}</AppContext.Provider>
+    return <AppContext.Provider value={{...state, getSingleProduct , GettingCartItem, cartHandling ,cartItemIncreament ,cartItemDecreament ,dispatch , createUser , loginTheUser , cUser , logOut, signUpWithGoogle ,addDoc , usersCollectionRef, vendorEmail, vendorDetails , createSeller, getCustomersForAdmin , getSellersForAdmin, getDeletedCustomersForAdmin, getDeletedSellersForAdmin,
+    deleteSelectedCustomers, deleteDeletedCustomers, deleteSelectedSellers, deleteDeletedSellers, getAllProductsForAdmin, handleEditProductClick, deleteSelectedProducts, getProductsStatus, getAllDeletedProductsForAdmin, deleteDeletedProducts, singleProductEdited , addProductForAdmin, showSellerAccount, showCustomerAccount, showAdminAccount}}>{children}</AppContext.Provider>
 }
 
 // custom hook

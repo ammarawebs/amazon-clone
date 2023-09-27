@@ -930,6 +930,10 @@ select.goog-te-combo{
   margin: 12px 0px 18px 0px ;
   box-shadow: none;
 }
+.auth_sign_up_button:focus{
+  border: none;
+  outline: none;
+}
 
 .auth_box{
   display: flex;

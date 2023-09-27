@@ -45,7 +45,8 @@ const Auth = () => {
         : registerError === 'someone-logged-in' ? <ErrorBox color='red' heading='There was a problem' msg='Some User already Logged in Please logged out first' /> 
         : googleError === 'someone-logged-in' ? <ErrorBox color='red' heading='There was a problem' msg='Some User already Logged in Please logged out first' /> 
         : googleError === 'network-error' ? <ErrorBox color='red' heading='Network problem' msg='Sorry there are some network Issues' />
-        : registerLoading ? <Loader/> : <></> }
+ 
+        : <></> }
        
           <div className="auth_box">
             <div className="auth_heading_div">
@@ -68,7 +69,7 @@ const Auth = () => {
                 <input type="password" id='auth_password' className='auth_input' value={registerUser.password} style={inputFieldError.password? errorStyle : style}   onChange={(e)=>dispatch({type : 'REGISTER_PASSWORD' , payload : e.target.value})} />
       
               <div className="auth_submit_button">
-                <button type='submit' className='auth_sign_up_button'>Sign Up</button>
+                <button type='submit' className='auth_sign_up_button'>{registerLoading ? <div style={{ height: '20px'}}><Loader size='20px' /></div> : 'sign Up' }</button>
               </div>
               </form>
               <div className="auth_signup_google">
@@ -87,7 +88,7 @@ const Auth = () => {
                 </div>
               </div>
               
-              <p className='auth_sign_in'>already have an account?<br/><Link to='/log-in'>sign in</Link></p>
+              <p className='auth_sign_in'>already have an account?<br/><Link to='/log-in'>Sign in</Link></p>
               
             </div>
           </div>

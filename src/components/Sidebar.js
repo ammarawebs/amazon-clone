@@ -6,7 +6,10 @@ import CartItem from './CartItem';
 import Button from '../authentication/Button';
 import { Link } from 'react-router-dom';
 import {loadStripe} from '@stripe/stripe-js'
+import {useNavigate} from 'react-router-dom'
 import {fetchStripeProducts, stripe} from '../Node/stripeIntegrations'
+import { auth ,db } from "../config/firebase-config";
+import Loader from '../authentication/Loader';
 
 
 let stripePromise;
@@ -25,24 +28,48 @@ const getStripe = () => {
 
 const Sidebar = () => {
 
-  
+  let navigate = useNavigate();
+
+  // let allCartItems = localStorage.getItem('cartItems');
+  // let readAllCartItems = JSON.parse(allCartItems)
+
+
+  // console.log('LOCAL CART', readAllCartItems)
   const [stripeError, setStripeError] = useState(null);
   const [isLoading, setLoading] = useState(false);
+                      
+    const {cartItem, cartHandling ,products , totalQuantity , totalPrice, checkout, localStorageCart, localCartTotalQuantity, localCartTotalPrice } = useProductContext() 
 
-    const {cartItem, cartHandling ,products , totalQuantity , totalPrice, checkout } = useProductContext() 
+    const localCartTotalPriceLimited = localCartTotalPrice.toFixed(2)
+    const localCartTotalPriceLimitedNumber = parseFloat(localCartTotalPriceLimited)
 
     const redirectToStripe = async (cartItems) => {
-      const products = await fetchStripeProducts();
-      console.log(products);
+
+
+     
+
+      // console.log(localStorageCart)
+      
+
+      if(auth?.currentUser?.email == undefined){
+        return navigate('/sign-up');
+      }
+      else{
+        setLoading(true);
+      const prices = await fetchStripeProducts();
+      console.log(prices);
     
       // Filter the products based on cartItem IDs
-      const matchingProducts = products.filter((product) =>
-        cartItem.some((cartItemProduct) => cartItemProduct.id === Number(product.product))
+      const matchingProducts = prices.filter((product) =>
+      localStorageCart.some((cartItemProduct) => cartItemProduct.id === Number(product.product) && product.active == true  )
       );
+
+      console.log(matchingProducts)
+
     
       // Construct line items from matching products
       const lineItems = matchingProducts.map((product) => {
-        const cartItemProduct = cartItem.find((cartItemProduct) => cartItemProduct.id === Number(product.product));
+        const cartItemProduct = localStorageCart.find((cartItemProduct) => cartItemProduct.id === Number(product.product));
         return {
           price: product.id,
           quantity: cartItemProduct ? cartItemProduct.quantity : 1, // Use cartItemProduct.quantity if available, otherwise default to 1
@@ -58,7 +85,7 @@ const Sidebar = () => {
       };
     
       // Redirect to Stripe checkout
-      setLoading(true);
+      
       console.log("redirectToCheckout");
     
       const stripe = await getStripe();
@@ -67,6 +94,11 @@ const Sidebar = () => {
     
       if (error) setStripeError(error.message);
       setLoading(false);
+
+      }
+
+
+      
     };
 
   return (
@@ -77,11 +109,13 @@ const Sidebar = () => {
             <button className='close_cart_btn' onClick={()=>{cartHandling()}} ><RxCross1 size='25px'/></button>
             <h1>Cart</h1>
             <div className="cart_total_quantity">
-              <h4>Total Quantity : {totalQuantity}</h4>
+              <h4>Total Quantity : {localCartTotalQuantity}</h4>
               
             </div>
             <div className='cartItems'>
-                {cartItem.map((item , index)=>{
+                {
+                  
+                  localStorageCart.map((item , index)=>{
                   const {id ,title , category, description ,image,price ,quantity } = item 
                   const product = products.find(prod => prod.id === id); // Find the corresponding product
 
@@ -89,11 +123,11 @@ const Sidebar = () => {
                 })}
               </div>
               <div className="cart_total_price">
-              <h3>Total Price : <b>$</b>{totalPrice}</h3>
+              <h3>Total Price : <b>$</b>{localCartTotalPriceLimitedNumber}</h3>
               </div>
-              { cartItem.length !== 0 ? 
+              { localStorageCart.length !== 0 ? 
                 <div className='cart_checkout_button' >
-                <Button title={isLoading? 'loading...' : 'Checkout' } onclick={()=>redirectToStripe(cartItem)}/>
+                <Button title={isLoading? <div style={{height: '20px'}}><Loader size='20px'/></div> : 'Checkout' } onclick={()=>redirectToStripe(localStorageCart)}/>
               </div>
               : <></>
               }

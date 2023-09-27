@@ -7,6 +7,7 @@ import { useProductContext } from '../context/ProductContext';
 import { FcGoogle } from "react-icons/fc";
 import Button from './Button';
 import Link_text from './Link_text';
+import Loader from './Loader';
 
 
 const Login = () => {
@@ -46,7 +47,8 @@ const Login = () => {
         : loginError == 'deleted' ? <ErrorBox color='red' heading='There was a problem' msg='Sorry this account is no longer available' />
         : googleError === 'someone-logged-in' ? <ErrorBox color='red' heading='There was a problem' msg='Some User already Logged in Please logged out first' />
         : googleError === 'network-error' ? <ErrorBox color='red' heading='Network problem' msg='Sorry there are some network Issues' />  
-        : loginLoading == true ?  <div className='loading_icon'><AiOutlineLoading size='30px' /></div> : <></> }
+        
+        : <></> }
         
           <div className="auth_box">
             <div className="auth_heading_div">
@@ -64,7 +66,7 @@ const Login = () => {
       
               <div className="auth_submit_button">
                 
-                <Button type='submit' title='Log In'/>
+                <Button type='submit' title={ loginLoading == true ?  <div style={{ height: '20px'}}><Loader size='20px' /></div> : 'sign in'  }/>
               </div>
               
               </form>

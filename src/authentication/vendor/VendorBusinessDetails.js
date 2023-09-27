@@ -4,10 +4,11 @@ import { Link } from 'react-router-dom';
 import { AiOutlineLoading } from "react-icons/ai";
 import { useProductContext } from '../../context/ProductContext';
 import ErrorBox from '../ErrorBox';
+import Loader from '../Loader';
 
 const VendorBusinessDetails = () => {
   
-        const {dispatch , createUser , vendor ,vendorInputError, vendorError, vendorLoading, vendorBusinessDetails } = useProductContext()
+        const {dispatch , createUser , vendor ,vendorInputError, vendorError, vendorLoading, createSeller } = useProductContext()
 
 
   
@@ -39,7 +40,7 @@ return (
       : vendorError.business === 'auth/email-already-in-use'   ?  <ErrorBox color='red' heading='There was a Problem' msg='This email address is already in use please try another email or login' /> 
       : vendorError.business === 'signIn' ? <ErrorBox color='green' heading='Sign Up Successful' msg='you are successfully registered to the site' />
       : vendorError.business === 'someone-logged-in' ? <ErrorBox color='red' heading='There was a problem' msg='Some User already Logged in Please logged out first' /> 
-      : vendorLoading ? <div className='loading_icon'><AiOutlineLoading size='30px' /></div> : <></> }
+      : <></> }
 
     <div className="auth_main">
       <div className="auth_second_main">
@@ -53,7 +54,7 @@ return (
             <h1 className='Vendor_details_heading'>Enter your Business name and your business Details</h1>
           </div>
           <div className="auth_input_section">
-              <form className="auth_input_section" action="" onSubmit={vendorBusinessDetails}> 
+              <form className="auth_input_section" action="" onSubmit={createSeller}> 
               <label htmlFor="auth_fname" className='auth_label'>Business name</label>
               <input type="text" id='auth_fname' className='auth_input'  value={vendor.bName} style={vendorInputError.bName? errorStyle : style} onChange={(e)=>dispatch({type : 'VENDOR_BNAME' , payload : e.target.value})} />
 
@@ -72,7 +73,7 @@ return (
               <input type="text" id='vendor_phone' className='auth_input' value={vendor.address} style={vendorInputError.address? errorStyle : style}   onChange={(e)=>dispatch({type : 'VENDOR_ADDRESS' , payload : e.target.value})} />
     
             <div className="auth_submit_button">
-              <button type='submit' className='auth_sign_up_button'>Create business Account</button>
+              <button type='submit' className='auth_sign_up_button'>{ vendorLoading ? <div style={{height:'20px'}}><Loader size='20px'/></div> :   'Create business Account'}</button>
             </div>
             </form>
             {/* <div className="auth_signup_google">

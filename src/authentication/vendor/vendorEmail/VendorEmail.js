@@ -5,6 +5,7 @@ import FeaturesHeading from './FeaturesHeading';
 import { auth ,db } from "../../../config/firebase-config";
 import ErrorBox from '../../ErrorBox';
 import { AiOutlineLoading } from "react-icons/ai";
+import Loader from '../../Loader';
 
 
 
@@ -49,7 +50,7 @@ const VendorEmail = () => {
         : vendorError.email === 'auth/email-already-in-use'   ?  <ErrorBox color='red' heading='There was a Problem' msg='This email address is already in use please try another email or login' /> 
         : vendorError.email === 'signIn' ? <ErrorBox color='green' heading='Sign Up Successful' msg='you are successfully registered to the site' />
         : vendorError.email === 'someone-logged-in' ? <ErrorBox color='red' heading='There was a problem' msg='Some User already Logged in Please logged out first' /> 
-        : vendorLoading ? <div className='loading_icon'><AiOutlineLoading size='30px' /></div> : <></> }
+        : <></> }
 
         <div className="vendorEmail">
           <div className="mainVendorEmail">
@@ -62,7 +63,7 @@ const VendorEmail = () => {
               </p>
               <form className='vendorEmailForm' action="" onSubmit={vendorEmail}>
                 <input type="email" className='auth_input' style={vendorError.email ==='empty-fields' || vendorInputError.email? errorStyle : style}  value={auth?.currentUser?.email !== undefined? auth.currentUser.email : vendor.email} onChange={(e)=>{dispatch({type: 'VENDOR_EMAIL_ONCHANGE' , payload: e.target.value  })}}/>
-                <button type='submit' className='auth_sign_up_button' style={{background: '#f90'}} >Get Started</button>
+                <button type='submit' className='auth_sign_up_button' style={{background: '#f90'}} >{ vendorLoading ? <div style={{ height: '20px'}}><Loader size='20px'/></div>:  'Get Started'}</button>
               </form>
               <div className="vendorEmailSignIn">
                 <p className="alreadySellerSignIn">Already Business Customer then <Link>Sign in</Link></p>

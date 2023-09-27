@@ -32,17 +32,37 @@ const createProductInStripe = async (productData) => {
 
 
 
-  const createProductsInStripe = async (products) => {
+  const createProductsInStripe = async (firbaseProducts) => {
     try {
-      for (const product of products) {
-        // Step 2: Create a product in Stripe
+      for (const product of firbaseProducts) {
+
+
+
+      const existingStripeProducts = await stripe.products.list({ limit: 100 });
+
+      const productExists = existingStripeProducts.data.some(
+        (stripeProduct) => stripeProduct.name === product.title
+      );
+
+      if (!productExists) {
+        //  Creating a product in Stripe
         const stripeProduct = await stripe.products.create({
           id: product.id,
-          name: product.name, 
+          name: product.title, 
           description: product.description,
-          image: [product.image]
+          images: [product.image]
         });
-  
+
+        const price = await stripe.prices.create({
+          product: stripeProduct.id,
+          unit_amount: product.price * 100, // Stripe price in cents
+          currency: 'usd', 
+          
+        });
+      }
+      else{
+        console.log(`Product "${product.name}" already exists in Stripe. Skipping...`);
+      }
        
       }
       console.log('Products created in Stripe successfully');
@@ -60,10 +80,59 @@ const fetchStripeProducts = async () => {
     
 
     // Use the `stripe` object to make API requests to fetch products
-    const prices = await stripe.prices.list();
+    const prices = await stripe.prices.list({ limit: 100 });
     return prices.data
   } catch (error) {
     console.error("Error fetching products:", error);
+  }
+};
+
+const fetchStripeAllProducts = async () => {
+  try {
+    
+
+    // Use the `stripe` object to make API requests to fetch products
+    const products = await stripe.products.list({ limit: 100 });
+    return products.data
+  } catch (error) {
+    console.error("Error fetching products:", error);
+  }
+};
+
+const updateStripeProduct = async (stripeProductId, updatedProductData) => {
+  try {
+    // Fetch the product from Stripe
+    const product = await stripe.products.update(stripeProductId, {
+      name: updatedProductData.title ,
+      description: updatedProductData.description,
+      images: [updatedProductData.image]
+    });
+
+    const prices = await stripe.prices.list({ product: stripeProductId });
+
+    console.log('PRICE',updatedProductData.price)
+
+    // Loop through the prices and updating them
+    for (const price of prices.data) {
+  
+      await stripe.prices.update(price.id, {
+        active: false,
+      });
+
+      
+      console.log("Price updated in Stripe:", price);
+    }
+
+     await stripe.prices.create({
+        product:stripeProductId,
+        unit_amount: updatedProductData.price * 100,
+        currency: 'usd',
+      });
+
+    
+  } catch (error) {
+    console.error("Error updating product in Stripe:", error);
+    throw error; // Rethrow the error to handle it in your error handling code.
   }
 };
 
@@ -75,4 +144,6 @@ const fetchStripeProducts = async () => {
     createProductInStripe,
     fetchStripeProducts,
     createProductsInStripe,
+    fetchStripeAllProducts,
+    updateStripeProduct,
   };

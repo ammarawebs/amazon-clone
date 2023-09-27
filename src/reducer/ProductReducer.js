@@ -60,55 +60,95 @@ const ProductReducer = (state, action) => {
         break;
       }
       break;
-    case "GETTING_CART_ITEM":
-      const { cartItem } = state; // Destructure cartItem from state
-      const productIndex = cartItem.findIndex(
-        (item) => item.id === action.payload.id
-      );
-      console.log(productIndex);
-
-      if (productIndex !== -1) {
-        return {
-          ...state,
-          cartItem: cartItem.map((item, index) => {
-            if (index === productIndex) {
-                const itemprice = item.price + action.payload.price
-                const limitedItemPrice = itemprice.toFixed(2)
-                const limitedItemPriceNumber = parseFloat(limitedItemPrice)
-              return { ...item, quantity: item.quantity + 1 , price : limitedItemPriceNumber };
-            }
-            return item;
-          }),
-        };
-      } else {
-        return {
-          ...state,
-          cartItem: [...cartItem, { ...action.payload, quantity: 1   }],
-        };
-      }
-      // No need for 'break' after return
-      break;
+      case "GETTING_CART_ITEM":
+        // console.log(action.payload)
+        // return state
+        // Get the current cart items from localStorage
+       
+        const localStorageCart = action.payload.localCart ;
+        // Get the index of the product in localStorageCart
+    const productIndex = localStorageCart.findIndex((item) => item.id === action.payload.item.id);
+  
+    if (productIndex !== -1) {
+      let limitedItemPriceNumber
+      // If the product exists in localStorageCart, update it
+      const updatedCart = localStorageCart.map((item, index) => {
+        if (index === productIndex) {
+          const itemprice = item.price + action.payload.item.price;
+          const limitedItemPrice = itemprice.toFixed(2);
+           limitedItemPriceNumber = parseFloat(limitedItemPrice);
+          return { ...item, quantity: item.quantity + 1, price: limitedItemPriceNumber };
+        }
+        return item;
+      });
+  
+      // Update the localStorage with the updated cart
+      localStorage.setItem("cart", JSON.stringify(updatedCart));
+      localStorage.setItem('quantity', action.payload.localQuantity + 1)
+      localStorage.setItem('price', action.payload.localPrice + action.payload.item.price )
+      
+  
+      return {
+        ...state,
+        cartItem: updatedCart,
+        localStorageCart : updatedCart,
+        localCartTotalQuantity : state.localCartTotalQuantity + 1,
+        localCartTotalPrice : state.localCartTotalPrice + action.payload.item.price,
+      };
+    } else {
+      // If the product doesn't exist in localStorageCart, add it
+      const updatedCart = [...localStorageCart, { ...action.payload.item, quantity: 1 }];
+  
+      // Update the localStorage with the updated cart
+      localStorage.setItem("cart", JSON.stringify(updatedCart));
+      localStorage.setItem('quantity', action.payload.localQuantity + 1 )
+      localStorage.setItem('price' , action.payload.localPrice + action.payload.item.price)
+  
+      return{
+        ...state,
+        cartItem: updatedCart,
+        localStorageCart : updatedCart,
+        localCartTotalQuantity : state.localCartTotalQuantity + 1,
+        localCartTotalPrice : state.localCartTotalPrice + action.payload.item.price,
+      };
+    }
+      
 
     case "CART_ITEM_INCREAMENT":
-      const productIncreamenttIndex = state.cartItem.findIndex(
+
+      const localStorageCartInc = action.payload.localCart ;
+      const productIncreamenttIndex = localStorageCartInc.findIndex(
         (item) => item.id === action.payload.item.id
       );
       console.log(productIncreamenttIndex);
+      let limitedIncPriceNumber
+
+     const updatedCartInc =  localStorageCartInc.map((item, index) => {
+        if (index === productIncreamenttIndex) {
+          const incPrice = item.price + action.payload.product.price
+          const limitedIncPrice = incPrice.toFixed(2)
+          limitedIncPriceNumber = parseFloat(limitedIncPrice)
+          return { ...item, quantity: item.quantity + 1 , price : limitedIncPriceNumber };
+        }
+        return item;
+      })
+
+      localStorage.setItem("cart", JSON.stringify(updatedCartInc));
+      localStorage.setItem('quantity', state.localCartTotalQuantity + 1)
+      localStorage.setItem('price' , state.localCartTotalPrice + action.payload.product.price  )
       return {
         ...state,
-        cartItem: state.cartItem.map((item, index) => {
-          if (index === productIncreamenttIndex) {
-            const incPrice = item.price + action.payload.product.price
-            const limitedIncPrice = incPrice.toFixed(2)
-            const limitedIncPriceNumber = parseFloat(limitedIncPrice)
-            return { ...item, quantity: item.quantity + 1 , price : limitedIncPriceNumber };
-          }
-          return item;
-        }),
+        cartItem: updatedCartInc,
+        localStorageCart : updatedCartInc,
+        localCartTotalQuantity : state.localCartTotalQuantity + 1,
+        localCartTotalPrice: state.localCartTotalPrice + action.payload.product.price ,
       };
 
       case "CART_ITEM_DECREAMENT":
-        const productDecrementIndex = state.cartItem.findIndex(
+
+        const localStorageCartDec = action.payload.localCart
+
+        const productDecrementIndex = localStorageCartDec.findIndex(
           (item) => item.id === action.payload.item.id
         );
       
@@ -116,8 +156,7 @@ const ProductReducer = (state, action) => {
           return state; // Item not found, return the current state
         }
       
-        const updatedCartItem = state.cartItem
-          .map((item, index) => {
+        const updatedCartItemDec = localStorageCartDec.map((item, index) => {
             if (index === productDecrementIndex) {
               if (item.quantity > 1) {
                 const decPrice = item.price - action.payload.product.price;
@@ -132,26 +171,34 @@ const ProductReducer = (state, action) => {
           })
           .filter((item) => item !== null);
       
-        const newTotalQuantity = updatedCartItem.reduce((total, item) => total + item.quantity, 0);
-        const newTotalPrice = updatedCartItem.reduce((total, item) => total + item.price * item.quantity, 0);
-      
+        const newTotalQuantity = updatedCartItemDec.reduce((total, item) => total + item.quantity, 0);
+        const newTotalPrice = updatedCartItemDec.reduce((total, item) => total + item.price * item.quantity, 0);
+          
+        localStorage.setItem("cart", JSON.stringify(updatedCartItemDec));
+        localStorage.setItem('quantity', state.localCartTotalQuantity - 1  )
+        localStorage.setItem('price', state.localCartTotalPrice - action.payload.product.price )
         return {
           ...state,
-          cartItem: updatedCartItem,
+          cartItem: updatedCartItemDec,
           totalQuantity: newTotalQuantity,
           totalPrice: newTotalPrice,
+          localStorageCart : updatedCartItemDec,
+          localCartTotalQuantity : state.localCartTotalQuantity - 1,
+          localCartTotalPrice : state.localCartTotalPrice - action.payload.product.price,
         };
 
       case 'TOTAL_QUANTITY_PRICE':
-        if (state.cartItem.length > 0) {
-          const updatedCartItems = state.cartItem.map((item) => ({
+
+          const TQPlocalStorageCart = action.payload.localCart
+        if (TQPlocalStorageCart.length > 0) {
+          const updatedCartItemsTotal = TQPlocalStorageCart.map((item) => ({
             ...item, // Keep the existing item properties
           }));
       
           let totalQuantity = 0;
           let totalPrice = 0;
       
-          updatedCartItems.forEach((item) => {
+          updatedCartItemsTotal.forEach((item) => {
             totalQuantity += item.quantity;
             totalPrice += item.price;
           });
@@ -159,12 +206,18 @@ const ProductReducer = (state, action) => {
           
           const limitedTotalPrice = totalPrice.toFixed(2)
 
+          localStorage.setItem("cart", JSON.stringify(updatedCartItemsTotal));
+          localStorage.setItem('quantity', totalQuantity )
+          localStorage.setItem('price', parseFloat(limitedTotalPrice) )
       
           return {
             ...state,
-            cartItem: updatedCartItems,
+            cartItem: updatedCartItemsTotal,
             totalQuantity: totalQuantity,
             totalPrice: parseFloat(limitedTotalPrice),
+            localStorageCart: updatedCartItemsTotal,
+            localCartTotalPrice : parseFloat(limitedTotalPrice),
+            localQuantity : totalQuantity,
           };
         }
       
@@ -201,9 +254,13 @@ const ProductReducer = (state, action) => {
       case 'LOGIN_USER':
         return {...state , currentUser : action.payload }
       case 'LOGOUT_USER':
+
         return {...state , currentUser : action.payload , user : {...state.user , role : ''}}
       case 'GOOGLE_SIGN_UP':
+        localStorage.setItem('loginAccountPage', 'customerAccount')
         return{...state , currentUser : action.payload}
+      case 'SET_GOOGLE_USER_NAME': 
+        localStorage.setItem('userName', action.payload )
       case 'CREATE_USER' : 
         console.log('create user runned')
         return {...state , user : {...state.user , firstname: action.payload.firstname , lastname : action.payload.lastname , id : action.payload.uid , email : action.payload.email , role : 'buyer' }}
@@ -220,6 +277,7 @@ const ProductReducer = (state, action) => {
       case 'REGISTER_NO_ERROR' : 
         return {...state, registerError: '', registerLoading : false }
       case 'REGISTER_SUCCESS': 
+        localStorage.setItem('loginAccountPage', 'customerAccount')
         return {...state ,  registerError : action.payload , registerLoading : false}
       case 'REGISTER_LOADING_TRUE':
         return {...state , registerLoading : true , registerError : ''  }
@@ -241,6 +299,8 @@ const ProductReducer = (state, action) => {
         return{...state , loginError : '' , loginLoading : true }
       case 'WRONG_PASSWORD': 
         return{...state , loginError : action.payload ,loginLoading : false }
+      case 'LOGIN_USER_NOT_FOUND':
+        return{...state , loginError : action.payload , loginLoading: false}
       case 'INVALID_EMAIL':
         return{...state , loginError : action.payload , loginLoading : false}
       case 'LOGIN_USER_IS_DELETED' : 
@@ -347,8 +407,10 @@ const ProductReducer = (state, action) => {
       case 'VENDOR_LOADING_TRUE':
         return{...state,  vendorLoading : true }
       case 'VENDOR_REGISTER_SUCCESS':
+        localStorage.setItem('loginAccountPage', 'sellerAccount')
         return{...state , vendorError : {...state.vendorError , business: action.payload } , vendorLoading : false }
       case 'VENDOR_REGISTER_USER':
+        localStorage.setItem('loginAccountPage', 'sellerAccount')
         return{...state , currentUser : action.payload }
       case 'VENDOR_EMPTY_REGISTER_FORM':
         return{...state , vendor : {...state.vendor , firstname : '', lastname : '', email : '', password : '', phone : '' , bname : '' , bDescription : '' , city : '' , country : '' , address : '' }}
@@ -360,6 +422,8 @@ const ProductReducer = (state, action) => {
         return{...state,  vendorError : {...state.vendorError , business: action.payload }}
       case 'VENDOR_NETWORK_REQUEST_FAILED':
         return{...state,  vendorError : {...state.vendorError , business: action.payload } }
+      case 'EMPTY_VENDOR_ERRORS':
+        return{...state, vendorError:{...state.vendorError ,  main : '', email : '', details : '', business : ''  } }
       case 'GET_USER_LOACTION_HEADER':
         return{...state , location : {...state.location , country : action.payload.country , city :action.payload.city }}
       case 'SHOW_SIGN_IN_DROPDOWN':
@@ -367,6 +431,7 @@ const ProductReducer = (state, action) => {
       case 'MAKE_SIGNUP_DROPDOWN_FALSE':
           return{...state, signInDropdown: false  }
       case 'SET_USER_ROLE_AND_NAME':
+        localStorage.setItem('userName' , action.payload.name )
         return{...state , user : {...state.user , role : action.payload.role , name : action.payload.name }}
       case 'ADD_CUSTOMERS_ARRAY_INTO_STATE':
         return{...state , userManagment: {...state.userManagment , customers :action.payload}}
@@ -452,6 +517,23 @@ const ProductReducer = (state, action) => {
         return{...state, addSingleProduct:{...state.addSingleProduct, image : action.payload}}
       case 'SET_ADD_PRODUCT_EMPTY':
         return{...state, addSingleProduct:{...state.addSingleProduct, title : '', category : '', description: '', price : '', image :''}}
+      case 'MAKE_CUSTOMER_ACCOUNT_TRUE':
+        localStorage.setItem('loginAccountPage' , 'customerAccount' )
+        return{...state , navbar : {...state.navbar , customerAccount : true}}
+      case 'MAKE_SELLER_ACCOUNT_TRUE':
+        localStorage.setItem('loginAccountPage' , 'sellerAccount' )
+        return{...state , navbar : {...state.navbar , sellerAccount : true }}
+      case 'MAKE_ACCOUNT_FALSE':
+        localStorage.setItem('loginAccountPage' , 'none' )
+        localStorage.setItem('userName' , 'Sign In' )
+        return{...state , navbar : {...state.navbar , sellerAccount : false}}
+      case 'MAKE_ADMIN_ACCOUNT_TRUE':
+        localStorage.setItem('loginAccountPage' , 'adminAccount' )
+        return{...state , navbar : {...state.navbar , adminAccount : true }}
+      case 'MAKE_USER_NAME_NONE':
+        localStorage.setItem('userName' , 'Sign In')
+        return state
+      
 
     default:
       return state;
