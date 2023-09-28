@@ -11,7 +11,7 @@ import { Link } from 'react-router-dom';
 const PaymentSucces = () => {
   
     let navigate = useNavigate();
-    const { localStorageCart, makeOrderComplete , localOrderId } = useProductContext() 
+    const {dispatch, localStorageCart, makeOrderComplete , localOrderId, getOrdersDataforAdmin } = useProductContext() 
 
 
     const NavigateToHome = () =>{
@@ -20,6 +20,8 @@ const PaymentSucces = () => {
 
     useEffect(()=>{
       makeOrderComplete()
+      getOrdersDataforAdmin()
+      dispatch({type : 'EMPTY_CART_ITEMS'})
     },[])
 
 

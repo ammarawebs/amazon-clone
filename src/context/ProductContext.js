@@ -161,6 +161,8 @@ const initialState ={
     localUserEmail : localStorage.getItem('userEmail') || '',
     localOrderId : localStorage.getItem('orderId') || '',
     ordersDataRef : [],
+    cancelOrdersDataRef : [],
+  
 
 
 
@@ -210,10 +212,33 @@ const  AppProvider = ({children}) => {
 
 
 
+    const getCancelOrdersDataforAdmin = async () => {
+      
+      try {
+        const q = query(ordersCollectionRef, where('status', '==', 'cancel'));
+        const ordersSnapshot = await getDocs(q);
+    
+        if (ordersSnapshot.empty) {
+          console.log('No complete orders found.');
+          return [];
+        }
+    
+        const ordersData = [];
+        ordersSnapshot.forEach((doc) => {
+          ordersData.push({ id: doc.id, ...doc.data() });
+        });
+    
+        dispatch({type: 'GET_CANCEL_ORDERS_DATA_FOR_ADMIN' , payload : ordersData })
+      } catch (error) {
+        console.error('Error fetching orders: ', error);
+        throw error; // You can handle the error as needed
+      }
+    };
 
 
 
     const getOrdersDataforAdmin = async () => {
+      
       try {
         const q = query(ordersCollectionRef, where('status', '==', 'complete'));
         const ordersSnapshot = await getDocs(q);
@@ -240,6 +265,31 @@ const  AppProvider = ({children}) => {
     
     
 
+
+    const makeOrderCancel = async () => {
+      try {
+        const orderId = await state.localOrderId;
+        
+        // Query Firestore to find the order with the given orderId
+        const q = query(ordersCollectionRef, where("orderId", "==", Number(orderId)));
+        const querySnapshot = await getDocs(q);
+        
+        if (!querySnapshot.empty) {
+          // There is an order with the given orderId
+          const orderDoc = querySnapshot.docs[0];
+          const orderRef = doc(db, "orders", orderDoc.id);
+    
+          // Update the status from 'incomplete' to 'complete'
+          await updateDoc(orderRef, { status: "cancel" });
+    
+          console.log("Order status updated to cancel");
+        } else {
+          console.log("No order found with orderId:", orderId);
+        }
+      } catch (error) {
+        console.error("Error updating order status:", error);
+      }
+    };
 
 
 
@@ -309,6 +359,8 @@ const  AppProvider = ({children}) => {
     const showAdminAccount = async () => {
       if (auth?.currentUser) {
         const uid = auth.currentUser.uid;
+
+        console.error('THOS OS THE UID' , uid)
     
         try {
           // Query Firestore to check if the user exists with 'buyer' role and the given UID
@@ -1378,6 +1430,10 @@ const  AppProvider = ({children}) => {
                 // Handle the case where the email is already registered, e.g., show an error message.
                 dispatch({ type: 'GOOGLE_SIGN_UP', payload: 'google new sign up' });
                 dispatch({type : 'SET_GOOGLE_USER_NAME', payload : name })
+                showSellerAccount()
+                showCustomerAccount()
+                showAdminAccount()
+                fetchUserRole();
                 return navigate('/'); // Exit the function to prevent adding duplicate users.
         
                 }
@@ -1401,6 +1457,10 @@ const  AppProvider = ({children}) => {
               await addDoc(usersCollectionRef, googleUser);
               dispatch({ type: 'GOOGLE_SIGN_UP', payload: 'google new sign up ' });
               dispatch({type : 'SET_GOOGLE_USER_NAME', payload : name })
+              showSellerAccount()
+              showCustomerAccount()
+              showAdminAccount()
+              fetchUserRole();
               return navigate('/'); 
                } catch (error) {
                 if (error.code === 'auth/internal-error') {
@@ -1825,7 +1885,7 @@ const  AppProvider = ({children}) => {
 
     return <AppContext.Provider value={{...state, getSingleProduct , GettingCartItem, cartHandling ,cartItemIncreament ,cartItemDecreament ,dispatch , createUser , loginTheUser , cUser , logOut, signUpWithGoogle ,addDoc , usersCollectionRef, vendorEmail, vendorDetails , createSeller, getCustomersForAdmin , getSellersForAdmin, getDeletedCustomersForAdmin, getDeletedSellersForAdmin,
     deleteSelectedCustomers, deleteDeletedCustomers, deleteSelectedSellers, deleteDeletedSellers, getAllProductsForAdmin, handleEditProductClick, deleteSelectedProducts, getProductsStatus, getAllDeletedProductsForAdmin, deleteDeletedProducts, singleProductEdited , addProductForAdmin, showSellerAccount, showCustomerAccount, showAdminAccount, saveOrderDataToFireBase, generateUniqueNumberId,
-    makeOrderComplete , getOrdersDataforAdmin}}>{children}</AppContext.Provider>
+    makeOrderComplete , getOrdersDataforAdmin , makeOrderCancel , getCancelOrdersDataforAdmin}}>{children}</AppContext.Provider>
 }
 
 // custom hook

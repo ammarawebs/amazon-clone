@@ -23,6 +23,7 @@ import NotFound from './routes/NotFound';
 import PaymentSucces from './routes/PaymentSucces';
 import PaymentCancel from './routes/PaymentCancel';
 import OrderManagement from './routes/AdminDashboard/OrderManagement';
+import Footer from './components/Footer';
 
 
 function App() {
@@ -72,6 +73,7 @@ function App() {
           
           
         </Routes>
+        <Footer/>
   
       {/* <HomePage/> */}
         

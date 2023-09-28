@@ -539,6 +539,14 @@ const ProductReducer = (state, action) => {
         return{...state , localOrderId: action.payload }
       case 'GET_ORDERS_DATA_FOR_ADMIN':
         return{...state ,  ordersDataRef : action.payload }
+      case 'GET_CANCEL_ORDERS_DATA_FOR_ADMIN':
+        return{...state ,  cancelOrdersDataRef: action.payload }
+      case 'EMPTY_CART_ITEMS':
+        localStorage.setItem('cart' ,  JSON.stringify([]))
+        localStorage.setItem('quantity' , 0 )
+        localStorage.setItem('price' , 0)
+        return{...state , localStorageCart: [] , localCartTotalQuantity: 0 , localCartTotalPrice : 0  }
+      
         
       
 

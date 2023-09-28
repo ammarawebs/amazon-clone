@@ -42,14 +42,17 @@ body{
   align-items: stretch;
   width: 1000px;
   height: auto;
-  margin-top: 100px;
-  margin-bottom: 100px;
+  margin-top: 30px;
+  margin-bottom: 30px;
 }
 
 .orderManagement_table{
   width: 100%;
 }
 
+button.MuiButtonBase-root.MuiIconButton-root.MuiIconButton-sizeSmall.MuiDataGrid-detailPanelToggleCell.css-1pe4mpk-MuiButtonBase-root-MuiIconButton-root {
+  background: rgb(255, 218, 98);
+}
 
 
 /* payment page style ends */
@@ -1024,6 +1027,23 @@ select.goog-te-combo{
   /* background: -webkit-linear-gradient(to bottom,rgba(0,0,0,.14),rgba(0,0,0,.03) 3px,transparent); */
   zoom: 1;
   
+}
+
+.auth_divider_inner{
+  background: linear-gradient(to bottom,rgba(0,0,0,.2),rgba(0,0,0,.03) 3px,transparent);
+ 
+  height: 44px;
+  margin-bottom: -18px;
+  /* background: -webkit-linear-gradient(to bottom,rgba(0,0,0,.14),rgba(0,0,0,.03) 3px,transparent); */
+  zoom: 1;
+  
+}
+.footer_main{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  bottom: 0;
+
 }
 .auth_divider_inner::after{
   background: linear-gradient(to right,#fff,rgba(255,255,255,0),#fff);

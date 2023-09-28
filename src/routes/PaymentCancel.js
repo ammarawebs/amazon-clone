@@ -1,11 +1,40 @@
-import React from 'react'
+import React, { useEffect } from 'react'
+import { useProductContext } from '../context/ProductContext'
+import { useNavigate } from 'react-router-dom'
+import { RxCrossCircled } from "react-icons/rx";
+import Button from '../authentication/Button';
 
 const PaymentCancel = () => {
+
+  let navigate = useNavigate();
+  const { dispatch , getCancelOrdersDataforAdmin, makeOrderCancel} = useProductContext() 
+
+  const NavigateToHome = () =>{
+    return navigate('/');
+  }
+
+
+  useEffect(()=>{
+    makeOrderCancel()
+    getCancelOrdersDataforAdmin()
+    dispatch({type : 'EMPTY_CART_ITEMS'})
+
+  },[])
+
+
   return (
     <>
-        <h1 style={{marginTop : '50px' , marginLeft: '50px'}}>
-            Your order was Cancel 
-        </h1>
+        <div className="payment_success_main">
+          <div className="payment_success_second_main">
+            <h1 >
+               Your Order was Canceled
+            </h1>
+            <p className='order_id_text'>The Payment Was not Completed</p>
+            <RxCrossCircled size='30px' color='red'/>
+            <br/>
+            <Button title='Contiue Shopping' onclick={NavigateToHome} />
+          </div>
+        </div>
     </>
   )
 }
