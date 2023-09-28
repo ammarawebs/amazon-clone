@@ -158,6 +158,9 @@ const initialState ={
     localStorageCart : JSON.parse(localStorage.getItem("cart")) || [],
     localCartTotalQuantity : Number(localStorage.getItem('quantity')) || 0,
     localCartTotalPrice : Number(localStorage.getItem('price')) || 0,
+    localUserEmail : localStorage.getItem('userEmail') || '',
+    localOrderId : localStorage.getItem('orderId') || '',
+    ordersDataRef : [],
 
 
 
@@ -166,11 +169,7 @@ const initialState ={
 
 
 
-function generateUniqueNumberId() {
-  const timestamp = new Date().getTime(); // Get current timestamp in milliseconds
-  const uniqueId = parseInt(`${timestamp}${Math.floor(Math.random() * 1000)}`, 10); // Append a random number
-  return uniqueId;
-}
+
 
 
 
@@ -185,11 +184,127 @@ const  AppProvider = ({children}) => {
 
     const usersCollectionRef = collection(db, 'users')
     const productsCollectionRef = collection(db, 'products');
+    const ordersCollectionRef = collection(db, 'orders');
+    
     const googleProvider = new GoogleAuthProvider
 
-     
+    const generateUniqueNumberId = () => {
+      const timestamp = new Date().getTime(); // Get current timestamp in milliseconds
+      const uniqueId = parseInt(`${timestamp}${Math.floor(Math.random() * 1000)}`, 10); // Append a random number
+      return uniqueId;
+    }
 
+    const formatDate = (date) => {
+      const day = String(date.getDate()).padStart(2, '0');
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const year = date.getFullYear();
+      return `${day}/${month}/${year}`;
+    };
+
+    const formatTime = (date) => {
+      const hours = String(date.getHours()).padStart(2, '0');
+      const minutes = String(date.getMinutes()).padStart(2, '0');
+      const seconds = String(date.getSeconds()).padStart(2, '0');
+      return `${hours}:${minutes}:${seconds}`;
+    };
+
+
+
+
+
+
+    const getOrdersDataforAdmin = async () => {
+      try {
+        const q = query(ordersCollectionRef, where('status', '==', 'complete'));
+        const ordersSnapshot = await getDocs(q);
+    
+        if (ordersSnapshot.empty) {
+          console.log('No complete orders found.');
+          return [];
+        }
+    
+        const ordersData = [];
+        ordersSnapshot.forEach((doc) => {
+          ordersData.push({ id: doc.id, ...doc.data() });
+        });
+    
+        dispatch({type: 'GET_ORDERS_DATA_FOR_ADMIN' , payload : ordersData })
+      } catch (error) {
+        console.error('Error fetching orders: ', error);
+        throw error; // You can handle the error as needed
+      }
+    };
+    
+    // Usage:
+   
+    
+    
+
+
+
+
+    const makeOrderComplete = async () => {
+      try {
+        const orderId = await state.localOrderId;
         
+        // Query Firestore to find the order with the given orderId
+        const q = query(ordersCollectionRef, where("orderId", "==", Number(orderId)));
+        const querySnapshot = await getDocs(q);
+        
+        if (!querySnapshot.empty) {
+          // There is an order with the given orderId
+          const orderDoc = querySnapshot.docs[0];
+          const orderRef = doc(db, "orders", orderDoc.id);
+    
+          // Update the status from 'incomplete' to 'complete'
+          await updateDoc(orderRef, { status: "complete" });
+    
+          console.log("Order status updated to complete");
+        } else {
+          console.log("No order found with orderId:", orderId);
+        }
+      } catch (error) {
+        console.error("Error updating order status:", error);
+      }
+    };
+
+     
+    const saveOrderDataToFireBase = async (orderId) => {
+      // Cart Data
+      const cartData = await state.localStorageCart;
+      const totalBill = await state.localCartTotalPrice;
+      const userEmail = await state.localUserEmail;
+    
+      // Fetch user data
+      const usersCollectionRef = collection(db, 'users');
+      const userQuery = query(usersCollectionRef, where('email', '==', userEmail));
+      const querySnapshot = await getDocs(userQuery);
+    
+      if (!querySnapshot.empty) {
+        const userData = querySnapshot.docs[0].data();
+    
+        // Get the current date and time
+        const currentDate = new Date();
+        const formattedDate = formatDate(currentDate);
+        const formattedTime = formatTime(currentDate);
+    
+        // Create an order object with the current date and time
+        const orderData = {
+          orderId: orderId,
+          status: 'incomplete',
+          date: formattedDate,
+          time: formattedTime, // Add the current time
+          cartData: cartData,
+          totalBill: totalBill,
+          userData: userData,
+        };
+    
+        // Add the order data to the 'orders' collection
+        await addDoc(ordersCollectionRef, orderData);
+    
+        console.log('Order data saved:', orderData);
+      }
+    };
 
     const showAdminAccount = async () => {
       if (auth?.currentUser) {
@@ -827,6 +942,7 @@ const  AppProvider = ({children}) => {
               dispatch({type : 'SET_USER_ROLE_AND_NAME' , payload : {
                 role : userData.role,
                 name : userData.firstname,
+                email: userData.email
               }})
             }
           }
@@ -1695,6 +1811,7 @@ const  AppProvider = ({children}) => {
 
         getDeletedCustomersForAdmin()
         getDeletedSellersForAdmin()
+        getOrdersDataforAdmin()
         // showSellerAccount()
         // showCustomerAccount()
         // showAdminAccount()
@@ -1707,7 +1824,8 @@ const  AppProvider = ({children}) => {
     },[state.currentUser])
 
     return <AppContext.Provider value={{...state, getSingleProduct , GettingCartItem, cartHandling ,cartItemIncreament ,cartItemDecreament ,dispatch , createUser , loginTheUser , cUser , logOut, signUpWithGoogle ,addDoc , usersCollectionRef, vendorEmail, vendorDetails , createSeller, getCustomersForAdmin , getSellersForAdmin, getDeletedCustomersForAdmin, getDeletedSellersForAdmin,
-    deleteSelectedCustomers, deleteDeletedCustomers, deleteSelectedSellers, deleteDeletedSellers, getAllProductsForAdmin, handleEditProductClick, deleteSelectedProducts, getProductsStatus, getAllDeletedProductsForAdmin, deleteDeletedProducts, singleProductEdited , addProductForAdmin, showSellerAccount, showCustomerAccount, showAdminAccount}}>{children}</AppContext.Provider>
+    deleteSelectedCustomers, deleteDeletedCustomers, deleteSelectedSellers, deleteDeletedSellers, getAllProductsForAdmin, handleEditProductClick, deleteSelectedProducts, getProductsStatus, getAllDeletedProductsForAdmin, deleteDeletedProducts, singleProductEdited , addProductForAdmin, showSellerAccount, showCustomerAccount, showAdminAccount, saveOrderDataToFireBase, generateUniqueNumberId,
+    makeOrderComplete , getOrdersDataforAdmin}}>{children}</AppContext.Provider>
 }
 
 // custom hook

@@ -432,7 +432,8 @@ const ProductReducer = (state, action) => {
           return{...state, signInDropdown: false  }
       case 'SET_USER_ROLE_AND_NAME':
         localStorage.setItem('userName' , action.payload.name )
-        return{...state , user : {...state.user , role : action.payload.role , name : action.payload.name }}
+        localStorage.setItem('userEmail' , action.payload.email )
+        return{...state , user : {...state.user , role : action.payload.role , name : action.payload.name } , localUserEmail:  action.payload.email  }
       case 'ADD_CUSTOMERS_ARRAY_INTO_STATE':
         return{...state , userManagment: {...state.userManagment , customers :action.payload}}
       case 'ADD_SELLERS_ARRAY_INTO_STATE':
@@ -533,6 +534,12 @@ const ProductReducer = (state, action) => {
       case 'MAKE_USER_NAME_NONE':
         localStorage.setItem('userName' , 'Sign In')
         return state
+      case 'UNIQUE_ID_FOR_ORDER':
+        localStorage.setItem('orderId' , action.payload)
+        return{...state , localOrderId: action.payload }
+      case 'GET_ORDERS_DATA_FOR_ADMIN':
+        return{...state ,  ordersDataRef : action.payload }
+        
       
 
     default:

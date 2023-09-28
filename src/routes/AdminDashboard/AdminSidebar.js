@@ -12,6 +12,7 @@ const AdminSidebar = () => {
                 <Link_text link='/admin-dashboard/user-management' title='User Management' color='white' />
                 <Link_text link='/admin-dashboard/product-management' title='Product Management' color='white' />
                 <Link_text link='/admin-dashboard/add-product' title='Add New Product' color='white' />
+                <Link_text link='/admin-dashboard/order-management' title='Order Management' color='white' />
 
               </div>
 

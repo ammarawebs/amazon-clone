@@ -22,6 +22,7 @@ import CheckoutPage from './routes/CheckoutPage';
 import NotFound from './routes/NotFound';
 import PaymentSucces from './routes/PaymentSucces';
 import PaymentCancel from './routes/PaymentCancel';
+import OrderManagement from './routes/AdminDashboard/OrderManagement';
 
 
 function App() {
@@ -47,6 +48,8 @@ function App() {
             <Route path="product-management" element={<ProductManagement/>}/>
             <Route path={`edit-product/:id`}  element={<SingleProductEdit/>} />
             <Route path='add-product' element={<AddNewProduct/>} />
+            <Route path='order-management' element={<OrderManagement/>} />
+
           </Route>
           
           <Route path='/' element={<HomePage />}/>

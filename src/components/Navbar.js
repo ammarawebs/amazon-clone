@@ -99,7 +99,9 @@ useEffect(()=>{
                     { localStorage.getItem('loginAccountPage') === 'customerAccount' ?<Link_text title='Customer Account'  padding='0px' margin='2px 0px' link='/user-dashboard' />:<></>}
                     { localStorage.getItem('loginAccountPage') === 'sellerAccount' ?<Link_text title='Seller Account'  padding='0px' margin='2px 0px' link='/seller-dashboard' />:<></>}
                     <Link_text title='Become a seller'  padding='0px' margin='2px 0px' link='/become-a-seller' />
-                    { localStorage.getItem('loginAccountPage') === 'adminAccount' ?<Link_text title='admin account'  padding='0px' margin='2px 0px' link='/admin-dashboard' />:<></>}
+                    {/* { localStorage.getItem('loginAccountPage') === 'adminAccount' ? */}
+                    <Link_text title='admin account'  padding='0px' margin='2px 0px' link='/admin-dashboard' />
+                    {/* :<></>} */}
                     {/* <a>{localStorage.getItem('loginAccountPage')}</a> */}
                     <br/>
                     {auth?.currentUser?.email !== undefined ? <button onClick={logOut}>Log Out</button> : <></> }

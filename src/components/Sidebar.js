@@ -38,7 +38,7 @@ const Sidebar = () => {
   const [stripeError, setStripeError] = useState(null);
   const [isLoading, setLoading] = useState(false);
                       
-    const {cartItem, cartHandling ,products , totalQuantity , totalPrice, checkout, localStorageCart, localCartTotalQuantity, localCartTotalPrice } = useProductContext() 
+    const {cartItem, dispatch , cartHandling ,products , totalQuantity , totalPrice, checkout, localStorageCart, localCartTotalQuantity, localCartTotalPrice, generateUniqueNumberId, saveOrderDataToFireBase } = useProductContext() 
 
     const localCartTotalPriceLimited = localCartTotalPrice.toFixed(2)
     const localCartTotalPriceLimitedNumber = parseFloat(localCartTotalPriceLimited)
@@ -46,16 +46,15 @@ const Sidebar = () => {
     const redirectToStripe = async (cartItems) => {
 
 
-     
-
-      // console.log(localStorageCart)
-      
-
       if(auth?.currentUser?.email == undefined){
         return navigate('/sign-up');
       }
       else{
         setLoading(true);
+        const uniqueId = generateUniqueNumberId();
+        dispatch({type:'UNIQUE_ID_FOR_ORDER', payload : uniqueId })
+        await saveOrderDataToFireBase(uniqueId)
+        
       const prices = await fetchStripeProducts();
       console.log(prices);
     
