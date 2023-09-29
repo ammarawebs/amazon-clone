@@ -53,7 +53,7 @@ function App() {
 
           </Route>
           
-          <Route path='/' element={<HomePage />}/>
+          <Route path='/' exact element={<HomePage />}/>
           <Route path={`/products/:id`} element={<Single_product/>}/>
           <Route path='/sign-up' element={<Auth />}/>
           <Route path='/log-in' element={<Login />}/>
