@@ -1885,7 +1885,7 @@ const  AppProvider = ({children}) => {
 
     return <AppContext.Provider value={{...state, getSingleProduct , GettingCartItem, cartHandling ,cartItemIncreament ,cartItemDecreament ,dispatch , createUser , loginTheUser , cUser , logOut, signUpWithGoogle ,addDoc , usersCollectionRef, vendorEmail, vendorDetails , createSeller, getCustomersForAdmin , getSellersForAdmin, getDeletedCustomersForAdmin, getDeletedSellersForAdmin,
     deleteSelectedCustomers, deleteDeletedCustomers, deleteSelectedSellers, deleteDeletedSellers, getAllProductsForAdmin, handleEditProductClick, deleteSelectedProducts, getProductsStatus, getAllDeletedProductsForAdmin, deleteDeletedProducts, singleProductEdited , addProductForAdmin, showSellerAccount, showCustomerAccount, showAdminAccount, saveOrderDataToFireBase, generateUniqueNumberId,
-    makeOrderComplete , getOrdersDataforAdmin , makeOrderCancel , getCancelOrdersDataforAdmin}}>{children}</AppContext.Provider>
+    makeOrderComplete , getOrdersDataforAdmin , makeOrderCancel , getCancelOrdersDataforAdmin , fetchStripeProducts}}>{children}</AppContext.Provider>
 }
 
 // custom hook

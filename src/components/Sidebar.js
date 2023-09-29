@@ -7,7 +7,8 @@ import Button from '../authentication/Button';
 import { Link } from 'react-router-dom';
 import {loadStripe} from '@stripe/stripe-js'
 import {useNavigate} from 'react-router-dom'
-import {fetchStripeProducts, stripe} from '../Node/stripeIntegrations'
+// import {fetchStripeProducts, stripe} from '../Node/stripeIntegrations'
+// const { createProductInStripe,fetchStripeProducts,  createProductsInStripe, fetchStripeAllProducts, updateStripeProduct } = require('../Node/stripeIntegrations'); // Adjust the path as needed
 import { auth ,db } from "../config/firebase-config";
 import Loader from '../authentication/Loader';
 
@@ -38,7 +39,7 @@ const Sidebar = () => {
   const [stripeError, setStripeError] = useState(null);
   const [isLoading, setLoading] = useState(false);
                       
-    const {cartItem, dispatch , cartHandling ,products , totalQuantity , totalPrice, checkout, localStorageCart, localCartTotalQuantity, localCartTotalPrice, generateUniqueNumberId, saveOrderDataToFireBase } = useProductContext() 
+    const {cartItem, dispatch , cartHandling ,products , totalQuantity , totalPrice, checkout, localStorageCart, localCartTotalQuantity, localCartTotalPrice, generateUniqueNumberId, saveOrderDataToFireBase, fetchStripeProducts } = useProductContext() 
 
     const localCartTotalPriceLimited = localCartTotalPrice.toFixed(2)
     const localCartTotalPriceLimitedNumber = parseFloat(localCartTotalPriceLimited)
