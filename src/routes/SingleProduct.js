@@ -9,9 +9,8 @@ import Loader from '../authentication/Loader'
 
 
 
-const API = 'https://fakestoreapi.com/products'
 
-const Single_product = () => {
+const SingleProduct = () => {
   
 
   
@@ -22,7 +21,7 @@ const Single_product = () => {
 
   const {id} = useParams()
 
-  const { category, description, image , price, rating, title  } = singleProduct;
+  const { category, description, image , price, title  } = singleProduct;
   
   
   
@@ -65,4 +64,4 @@ const Single_product = () => {
   )
 }
 
-export default Single_product
+export default SingleProduct

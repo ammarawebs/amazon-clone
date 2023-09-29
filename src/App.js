@@ -1,10 +1,10 @@
 
-import React ,{ useEffect, useReducer, useState } from 'react';
+import React from 'react';
 import './App.css';
 import axios from './axios';
 import {  Route , Routes , useNavigate } from 'react-router-dom';
 import HomePage from './routes/HomePage';
-import Single_product from './routes/Single_product';
+import SingleProduct from './routes/SingleProduct';
 import Navbar from './components/Navbar';
 import Auth from './authentication/Auth';
 import Login from './authentication/Login';
@@ -54,7 +54,7 @@ function App() {
           </Route>
           
           <Route path='/' exact element={<HomePage />}/>
-          <Route path={`/products/:id`} element={<Single_product/>}/>
+          <Route path={`/products/:id`} element={<SingleProduct/>}/>
           <Route path='/sign-up' element={<Auth />}/>
           <Route path='/log-in' element={<Login />}/>
           <Route path='/become-a-seller' element={<Vendor/>}/>

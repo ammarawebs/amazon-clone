@@ -1,5 +1,5 @@
 import React from 'react'
-import Single_product from '../routes/Single_product'
+import Single_product from '../routes/SingleProduct'
 
 const AddToCart = ({product}) => {
 
