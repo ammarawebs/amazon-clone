@@ -34,8 +34,9 @@ function App() {
     <>
     
     
-        <Navbar/>
+    <Navbar/>
         <Routes>
+        
 
           <Route element={<ProtectedRoutes/>}>
             

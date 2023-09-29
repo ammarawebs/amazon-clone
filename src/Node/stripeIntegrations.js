@@ -140,10 +140,10 @@ const updateStripeProduct = async (stripeProductId, updatedProductData) => {
 
 
 
-  module.exports = {
-    createProductInStripe,
-    fetchStripeProducts,
-    createProductsInStripe,
-    fetchStripeAllProducts,
-    updateStripeProduct,
-  };
+export {
+  createProductInStripe,
+  fetchStripeProducts,
+  createProductsInStripe,
+  fetchStripeAllProducts,
+  updateStripeProduct,
+};
